@@ -1,0 +1,948 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Revisão G1 · Paradigmas de Linguagens de Programação</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible+Next:ital,wght@0,400;0,600;0,800;1,400&family=Atkinson+Hyperlegible+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  /* claro: branco puro, verde-mineral como marca, ferrugem para alertas */
+  --bg:oklch(1 0 0); --surface:oklch(0.978 0.005 175); --surface2:oklch(0.952 0.01 175);
+  --ink:oklch(0.21 0.012 175); --muted:oklch(0.44 0.014 175); --line:oklch(0.885 0.012 175);
+  --primary:oklch(0.5 0.085 172); --primary-hover:oklch(0.44 0.085 172); --on-primary:oklch(1 0 0);
+  --primary-soft:oklch(0.945 0.03 172); --primary-ink:oklch(0.4 0.08 172);
+  --accent:oklch(0.54 0.15 35); --accent-soft:oklch(0.955 0.025 35);
+  --ok:oklch(0.5 0.12 152); --ok-soft:oklch(0.955 0.035 152);
+  --bad:oklch(0.54 0.17 25); --bad-soft:oklch(0.955 0.028 25);
+  --hero:oklch(0.25 0.045 178); --hero-code:oklch(0.17 0.022 180); --hero-ink:oklch(0.97 0.01 170); --hero-muted:oklch(0.8 0.03 172); --hero-line:oklch(0.97 0.01 170 / .16);
+  --tok-id:oklch(0.8 0.085 170); --tok-op:oklch(0.84 0.12 80); --tok-num:oklch(0.8 0.09 250); --tok-cm:oklch(0.76 0.13 30);
+  --sans:"Atkinson Hyperlegible Next", "Segoe UI", system-ui, -apple-system, sans-serif;
+  --mono:"Atkinson Hyperlegible Mono", ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+  --ease-out:cubic-bezier(.22,1,.36,1);
+  --z-sticky:10; --z-drag:40;
+  --r-s:8px; --r-m:12px; --r-l:18px;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:oklch(0.14 0 0); --surface:oklch(0.18 0.008 175); --surface2:oklch(0.225 0.012 175);
+    --ink:oklch(0.95 0.005 175); --muted:oklch(0.75 0.014 175); --line:oklch(0.31 0.012 175);
+    --primary:oklch(0.76 0.08 170); --primary-hover:oklch(0.82 0.08 170); --on-primary:oklch(0.17 0.02 178);
+    --primary-soft:oklch(0.27 0.035 172); --primary-ink:oklch(0.82 0.08 170);
+    --accent:oklch(0.74 0.13 35); --accent-soft:oklch(0.25 0.04 35);
+    --ok:oklch(0.78 0.13 152); --ok-soft:oklch(0.26 0.045 152);
+    --bad:oklch(0.73 0.15 25); --bad-soft:oklch(0.26 0.05 25);
+    --hero:oklch(0.2 0.035 178); --hero-code:oklch(0.12 0.015 180);
+  }
+}
+:root[data-theme="dark"]{
+  --bg:oklch(0.14 0 0); --surface:oklch(0.18 0.008 175); --surface2:oklch(0.225 0.012 175);
+  --ink:oklch(0.95 0.005 175); --muted:oklch(0.75 0.014 175); --line:oklch(0.31 0.012 175);
+  --primary:oklch(0.76 0.08 170); --primary-hover:oklch(0.82 0.08 170); --on-primary:oklch(0.17 0.02 178);
+  --primary-soft:oklch(0.27 0.035 172); --primary-ink:oklch(0.82 0.08 170);
+  --accent:oklch(0.74 0.13 35); --accent-soft:oklch(0.25 0.04 35);
+  --ok:oklch(0.78 0.13 152); --ok-soft:oklch(0.26 0.045 152);
+  --bad:oklch(0.73 0.15 25); --bad-soft:oklch(0.26 0.05 25);
+  --hero:oklch(0.2 0.035 178); --hero-code:oklch(0.12 0.015 180);
+}
+*,*::before,*::after{box-sizing:inherit}
+html{scroll-padding-top:calc(env(safe-area-inset-top,0px) + 64px);scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:1.0625rem;line-height:1.62;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
+img,svg{max-width:100%}
+button{font:inherit;color:inherit;cursor:pointer}
+:focus-visible{outline:3px solid var(--primary);outline-offset:2px;border-radius:6px}
+code,.mono{font-family:var(--mono);font-size:.9em}
+p code,li code,td code{background:var(--surface2);padding:.08em .38em;border-radius:5px}
+pre{font-family:var(--mono);font-size:.875rem;line-height:1.6;background:var(--hero-code);color:var(--hero-ink);padding:16px 18px;border-radius:var(--r-m);overflow-x:auto;margin:14px 0}
+a{color:var(--primary-ink);text-underline-offset:3px}
+h1,h2,h3{text-wrap:balance}
+p,li{text-wrap:pretty}
+
+/* ---------- HERO: papel quadriculado verde-mineral ---------- */
+.hero{background-color:var(--hero);color:var(--hero-ink);position:relative;overflow:hidden;padding:24px 20px 56px;
+  background-image:radial-gradient(oklch(1 0 0 / .09) 1px, transparent 1.3px);background-size:22px 22px;background-position:-11px -11px}
+.hero-inner{position:relative;max-width:1120px;margin:0 auto}
+.hero-top{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;color:var(--hero-muted);font-size:.875rem}
+.theme-btn{background:transparent;border:1px solid var(--hero-line);color:var(--hero-ink);border-radius:999px;padding:6px 14px;font-size:.875rem;transition:background-color .18s var(--ease-out)}
+.theme-btn:hover{background:oklch(1 0 0 / .08)}
+.hero h1{font-size:clamp(2.6rem,7.2vw,6rem);line-height:.96;letter-spacing:-.03em;font-weight:800;margin:44px 0 18px;max-width:13ch}
+.hero .lede{font-size:clamp(1.0625rem,1.8vw,1.25rem);color:var(--hero-muted);max-width:58ch;margin:0 0 28px}
+.hero-cta{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:40px}
+.btn{border:0;border-radius:var(--r-m);padding:13px 20px;font-weight:600;font-size:1rem;text-decoration:none;display:inline-flex;align-items:center;gap:8px;transition:background-color .18s var(--ease-out),transform .12s var(--ease-out)}
+.btn:active,.btn-s:active{transform:scale(.97)}
+.btn-primary{background:var(--tok-id);color:oklch(0.2 0.03 178)}
+.btn-primary:hover{background:oklch(0.86 0.085 170)}
+.btn-ghost{background:transparent;color:var(--hero-ink);border:1px solid var(--hero-line)}
+.btn-ghost:hover{background:oklch(1 0 0 / .08)}
+
+.machine{background:var(--hero-code);border:1px solid var(--hero-line);border-radius:var(--r-l);padding:18px}
+.machine-bar{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:10px}
+.machine-bar .dots{display:flex;gap:6px}
+.machine-bar .dots i{width:10px;height:10px;border-radius:50%;background:oklch(1 0 0 / .22);display:block}
+.machine-bar .fname{font-family:var(--mono);font-size:.8125rem;color:var(--hero-muted)}
+.stages{display:flex;gap:6px;flex-wrap:wrap}
+.stage-btn{background:transparent;border:1px solid var(--hero-line);color:var(--hero-muted);border-radius:999px;padding:6px 12px;font-size:.84rem;transition:background-color .18s var(--ease-out),color .18s var(--ease-out)}
+.stage-btn:hover{color:var(--hero-ink)}
+.stage-btn[aria-pressed="true"]{background:var(--tok-id);border-color:var(--tok-id);color:oklch(0.2 0.03 178)}
+.source{font-family:var(--mono);font-size:clamp(.95rem,2.3vw,1.35rem);padding:14px 4px 6px;overflow-x:auto;white-space:nowrap}
+.source .cm{color:var(--tok-cm);opacity:.8}
+.stage-view{min-height:200px;border-top:1px dashed var(--hero-line);margin-top:10px;padding-top:16px}
+.stage-title{font-weight:600;font-size:.95rem;margin:0 0 4px}
+.stage-desc{color:var(--hero-muted);font-size:.95rem;margin:0 0 14px;max-width:70ch}
+.tokens{display:flex;flex-wrap:wrap;gap:8px}
+.tok{display:flex;flex-direction:column;align-items:center;gap:4px;opacity:0;transform:translateY(6px);filter:blur(3px);animation:tokIn .42s var(--ease-out) forwards}
+.tok b{font-family:var(--mono);font-weight:600;padding:5px 10px;border-radius:var(--r-s);font-size:.95rem;border:1px solid}
+.tok small{font-size:.7rem;color:var(--hero-muted)}
+.tok.id b{color:var(--tok-id);border-color:oklch(0.8 0.085 170 / .5);background:oklch(0.8 0.085 170 / .1)}
+.tok.op b{color:var(--tok-op);border-color:oklch(0.84 0.12 80 / .5);background:oklch(0.84 0.12 80 / .1)}
+.tok.num b{color:var(--tok-num);border-color:oklch(0.8 0.09 250 / .5);background:oklch(0.8 0.09 250 / .1)}
+.tok.pt b{color:var(--hero-ink);border-color:var(--hero-line);background:oklch(1 0 0 / .04)}
+.tok.cmt b{color:var(--tok-cm);border-style:dashed;border-color:oklch(0.76 0.13 30 / .6);text-decoration:line-through;background:transparent}
+@keyframes tokIn{to{opacity:1;transform:none;filter:none}}
+.tree{display:flex;justify-content:flex-start;overflow-x:auto;padding-bottom:6px}
+.node{display:flex;flex-direction:column;align-items:center;position:relative}
+.node>.lbl{font-family:var(--mono);font-size:.875rem;padding:3px 10px;border-radius:var(--r-s);border:1px solid var(--hero-line);white-space:nowrap}
+.node.op>.lbl{color:var(--tok-op);border-color:oklch(0.84 0.12 80 / .55)}
+.node.leaf-id>.lbl{color:var(--tok-id);border-color:oklch(0.8 0.085 170 / .55)}
+.node.leaf-num>.lbl{color:var(--tok-num);border-color:oklch(0.8 0.09 250 / .55)}
+.kids{display:flex;margin-top:18px;position:relative}
+.kids>.node{padding:0 6px}
+.kids>.node::before{content:"";position:absolute;top:-9px;left:50%;height:9px;border-left:1px solid var(--hero-line)}
+.kids>.node::after{content:"";position:absolute;top:-9px;left:0;right:0;border-top:1px solid var(--hero-line)}
+.kids>.node:first-child::after{left:50%}
+.kids>.node:last-child::after{right:50%}
+.kids>.node:only-child::after{display:none}
+.kids::before{content:"";position:absolute;top:-18px;left:50%;height:9px;border-left:1px solid var(--hero-line)}
+.checks{list-style:none;padding:0;margin:0;display:grid;gap:8px}
+.checks li{font-family:var(--mono);font-size:.875rem;display:flex;gap:10px;align-items:baseline}
+.checks li span:first-child{color:var(--tok-id)}
+.symtab{border-collapse:collapse;font-family:var(--mono);font-size:.84rem;margin-top:12px}
+.symtab th,.symtab td{border:1px solid var(--hero-line);padding:5px 12px;text-align:left}
+.symtab th{color:var(--hero-muted);font-weight:400}
+.result{font-family:var(--mono);font-size:clamp(1rem,2.3vw,1.35rem)}
+.result .big{font-family:var(--sans);font-weight:800;font-size:clamp(2.1rem,5.5vw,3.5rem);letter-spacing:-.02em;color:var(--tok-id);display:block;line-height:1.1;margin-top:6px}
+
+/* ---------- LAYOUT ---------- */
+.layout{max-width:1120px;margin:0 auto;padding:0 20px;display:grid;grid-template-columns:220px minmax(0,1fr);gap:56px}
+@media (max-width:880px){.layout{grid-template-columns:minmax(0,1fr);gap:0}}
+.toc{position:sticky;top:calc(env(safe-area-inset-top,0px) + 20px);align-self:start;padding:40px 0;font-size:.9375rem}
+@media (max-width:880px){.toc{display:none}}
+.toc ol{list-style:none;padding:0;margin:0;display:grid;gap:1px}
+.toc a{display:block;padding:6px 10px;border-radius:var(--r-s);text-decoration:none;color:var(--muted);transition:background-color .15s var(--ease-out),color .15s var(--ease-out)}
+.toc a:hover{background:var(--surface2);color:var(--ink)}
+.toc a.on{background:var(--primary-soft);color:var(--primary-ink);font-weight:600}
+.toc .progress{margin-top:24px;padding:14px 12px;border-top:1px solid var(--line)}
+.toc .progress b{font-size:1.75rem;display:block;line-height:1.1;font-variant-numeric:tabular-nums}
+.bar{height:6px;background:var(--surface2);border-radius:99px;overflow:hidden;margin-top:10px}
+.bar>i{display:block;height:100%;width:100%;background:var(--primary);transform-origin:left center;transform:scaleX(0);transition:transform .45s var(--ease-out)}
+.mnav{display:none;position:sticky;top:0;z-index:var(--z-sticky);background:var(--bg);border-bottom:1px solid var(--line);padding:calc(env(safe-area-inset-top,0px) + 8px) 14px 8px;overflow-x:auto;white-space:nowrap}
+.mnav a{display:inline-block;padding:6px 12px;margin-right:4px;border-radius:999px;text-decoration:none;color:var(--muted);font-size:.875rem;border:1px solid var(--line)}
+@media (max-width:880px){.mnav{display:block}}
+
+main{padding:40px 0 88px;min-width:0}
+section.aula{padding:32px 0 44px;border-bottom:1px solid var(--line)}
+.aula-head{display:flex;flex-direction:column;gap:6px;margin-bottom:4px}
+.aula-num{font-family:var(--mono);color:var(--primary-ink);font-size:.875rem;font-weight:600}
+h2{font-size:clamp(1.9rem,3.6vw,2.6rem);line-height:1.08;letter-spacing:-.02em;margin:0;font-weight:800}
+.aula-intro{color:var(--muted);font-size:1.15rem;max-width:62ch;margin:12px 0 26px}
+h3{font-size:1.3rem;letter-spacing:-.01em;margin:36px 0 8px;line-height:1.25;font-weight:700}
+p,ul,ol{max-width:70ch}
+ul.clean{padding-left:20px}
+ul.clean li{margin:6px 0}
+.table-wrap{overflow-x:auto;margin:16px 0}
+table.t{border-collapse:collapse;width:100%;min-width:480px;font-size:.97rem;border:1px solid var(--line);border-radius:var(--r-m);border-spacing:0;overflow:hidden}
+table.t th,table.t td{text-align:left;padding:10px 14px;border-bottom:1px solid var(--line);vertical-align:top}
+table.t th{background:var(--surface);font-weight:600}
+table.t tr:last-child td{border-bottom:0}
+/* notas: tinta de fundo + borda inteira, rótulo inline em vez de faixa lateral */
+.trap,.memo{padding:13px 16px;border-radius:var(--r-m);margin:18px 0;max-width:70ch;border:1px solid}
+.trap{background:var(--accent-soft);border-color:oklch(0.54 0.15 35 / .3)}
+.trap strong:first-child{color:var(--accent)}
+.memo{background:var(--primary-soft);border-color:oklch(0.5 0.085 172 / .28)}
+.memo strong:first-child{color:var(--primary-ink)}
+.def{border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:16px 0;margin:16px 0;max-width:70ch;font-size:1.08rem}
+.def b{color:var(--primary-ink)}
+
+/* widgets: um único nível de superfície, sem cards aninhados */
+.widget{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-l);padding:22px;margin:26px 0}
+.widget-title{font-weight:700;font-size:1.06rem;margin:0 0 2px}
+.widget-hint{color:var(--muted);font-size:.93rem;margin:0 0 16px}
+.flip-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(172px,1fr));gap:10px}
+.flip{perspective:900px;min-height:156px;border:0;background:none;padding:0;text-align:left;border-radius:var(--r-m)}
+.flip-in{position:relative;width:100%;height:100%;min-height:156px;transition:transform .55s var(--ease-out);transform-style:preserve-3d}
+.flip[aria-pressed="true"] .flip-in{transform:rotateY(180deg)}
+.flip-face{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;border-radius:var(--r-m);padding:14px;display:flex;flex-direction:column;justify-content:space-between}
+.flip-front{background:var(--bg);border:1px solid var(--line);transition:border-color .15s var(--ease-out)}
+.flip:hover .flip-front{border-color:var(--primary)}
+.flip-front strong{font-size:1.2rem;line-height:1.15}
+.flip-front small{color:var(--muted);font-size:.8rem}
+.flip-back{background:var(--hero);color:var(--hero-ink);transform:rotateY(180deg);font-size:.9rem;line-height:1.45}
+.flip-back em{color:var(--hero-muted);font-style:normal;font-size:.8rem;display:block;margin-top:6px}
+.seg{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:16px}
+.seg button{background:transparent;border:1px solid var(--line);border-radius:999px;padding:7px 14px;font-size:.93rem;transition:background-color .15s var(--ease-out),border-color .15s var(--ease-out)}
+.seg button:hover{border-color:var(--primary)}
+.seg button[aria-pressed="true"]{background:var(--primary);border-color:var(--primary);color:var(--on-primary)}
+.panel{background:var(--bg);border:1px solid var(--line);border-radius:var(--r-m);padding:16px 18px;animation:panelIn .25s var(--ease-out)}
+@keyframes panelIn{from{opacity:.4;transform:translateY(3px)}to{opacity:1;transform:none}}
+.panel h4{margin:0 0 6px;font-size:1.1rem}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin:10px 0 0;padding:0;list-style:none}
+.chips li{background:var(--surface2);border-radius:999px;padding:4px 12px;font-size:.9rem}
+.timeline{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:0;margin-bottom:14px;border:1px solid var(--line);border-radius:var(--r-m);overflow:hidden}
+@media (max-width:560px){.timeline{grid-template-columns:repeat(3,minmax(0,1fr))}}
+.timeline button{background:var(--bg);border:0;border-right:1px solid var(--line);padding:10px 6px;font-weight:800;font-size:1rem;transition:background-color .15s var(--ease-out)}
+.timeline button:last-child{border-right:0}
+.timeline button small{display:block;font-weight:400;font-size:.72rem;color:var(--muted)}
+.timeline button:hover{background:var(--surface2)}
+.timeline button[aria-pressed="true"]{background:var(--primary);color:var(--on-primary)}
+.timeline button[aria-pressed="true"] small{color:inherit;opacity:.85}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.input{font-family:var(--mono);font-size:1rem;padding:10px 12px;border-radius:var(--r-s);border:1px solid var(--line);background:var(--bg);color:var(--ink);min-width:0;width:180px}
+.input:focus{border-color:var(--primary)}
+.btn-s{background:var(--primary);color:var(--on-primary);border:1px solid var(--primary);border-radius:var(--r-s);padding:10px 16px;font-weight:600;font-size:.95rem;transition:background-color .15s var(--ease-out),transform .12s var(--ease-out)}
+.btn-s:hover{background:var(--primary-hover)}
+.btn-s.alt{background:transparent;color:var(--ink);border:1px solid var(--line)}
+.btn-s.alt:hover{background:var(--surface2)}
+.btn-s[disabled]{opacity:.4;cursor:default;transform:none}
+.deriv{font-family:var(--mono);font-size:.95rem;margin-top:14px;display:grid;gap:3px}
+.deriv div{padding:5px 10px;border-radius:var(--r-s);opacity:0;animation:tokIn .3s var(--ease-out) forwards}
+.deriv div:last-child{background:var(--ok-soft);color:var(--ok);font-weight:600}
+.verdict{margin-top:12px;padding:10px 14px;border-radius:var(--r-s);font-size:.97rem}
+.verdict.ok{background:var(--ok-soft);color:var(--ok)}
+.verdict.bad{background:var(--bad-soft);color:var(--bad)}
+.stepper{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px}
+@media (max-width:640px){.stepper{grid-template-columns:minmax(0,1fr)}}
+.mem{font-family:var(--mono);background:var(--hero-code);color:var(--hero-ink);border-radius:var(--r-m);padding:14px 16px;font-size:.9rem}
+.mem .cell{font-size:2.75rem;font-weight:600;color:var(--tok-id);line-height:1.1;font-variant-numeric:tabular-nums}
+.mem .log{color:var(--hero-muted);max-height:150px;overflow:auto;margin-top:8px;font-size:.8rem}
+.layers{display:flex;flex-direction:column-reverse;gap:4px}
+.layer{border:1px solid var(--line);border-radius:var(--r-s);padding:10px 14px;background:var(--bg);text-align:left;display:flex;justify-content:space-between;gap:10px;align-items:center;transition:background-color .15s var(--ease-out)}
+.layer:hover{background:var(--surface2)}
+.layer span{font-size:.8rem;color:var(--muted)}
+.layer[aria-pressed="true"]{background:var(--primary);color:var(--on-primary);border-color:var(--primary)}
+.layer[aria-pressed="true"] span{color:inherit;opacity:.85}
+.duo{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px}
+@media (max-width:640px){.duo{grid-template-columns:minmax(0,1fr)}}
+.duo pre{margin:8px 0}
+.out{font-family:var(--mono);font-size:.875rem;padding:10px 12px;border-radius:var(--r-s);min-height:44px;margin-top:8px}
+.out.err{background:var(--bad-soft);color:var(--bad)}
+.out.ok{background:var(--ok-soft);color:var(--ok)}
+.pipe{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px}
+.pipe button{background:var(--bg);border:1px solid var(--line);border-radius:var(--r-s);padding:7px 12px;font-size:.9rem;transition:background-color .15s var(--ease-out)}
+.pipe button:hover{border-color:var(--primary)}
+.pipe button .n{font-family:var(--mono);color:var(--primary-ink);margin-right:6px}
+.pipe button[aria-pressed="true"]{background:var(--primary);color:var(--on-primary);border-color:var(--primary)}
+.pipe button[aria-pressed="true"] .n{color:inherit}
+.tag{display:inline-block;font-size:.78rem;border-radius:6px;padding:2px 8px;margin-left:8px;background:var(--accent-soft);color:var(--accent);font-weight:600;vertical-align:middle}
+/* comparação: uma tabela em colunas, não três cards */
+.cmp{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));border:1px solid var(--line);border-radius:var(--r-l);overflow:hidden}
+@media (max-width:720px){.cmp{grid-template-columns:minmax(0,1fr)}}
+.cmp>div{padding:18px;border-right:1px solid var(--line)}
+.cmp>div:last-child{border-right:0}
+@media (max-width:720px){.cmp>div{border-right:0;border-bottom:1px solid var(--line)}.cmp>div:last-child{border-bottom:0}}
+.cmp h4{margin:0 0 2px;font-size:1.2rem}
+.cmp .ex{font-family:var(--mono);font-size:.84rem;color:var(--primary-ink)}
+
+/* ---------- SIMULADO ---------- */
+#simulado{padding-top:40px}
+.quiz-shell{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-l);padding:22px;margin-top:18px}
+.qbar{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;align-items:center;margin-bottom:8px;font-size:.9rem;color:var(--muted)}
+.qbar strong{color:var(--ink);font-variant-numeric:tabular-nums}
+.filters{display:flex;flex-wrap:wrap;gap:6px;margin:12px 0 6px}
+.filters button{background:var(--bg);border:1px solid var(--line);border-radius:999px;padding:6px 12px;font-size:.875rem;transition:background-color .15s var(--ease-out)}
+.filters button:hover{border-color:var(--primary)}
+.filters button[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.qcard{margin-top:20px}
+.qmeta{font-size:.84rem;color:var(--muted);margin-bottom:6px;font-variant-numeric:tabular-nums}
+.qtext{font-size:1.3rem;font-weight:700;line-height:1.38;margin:0 0 18px;max-width:62ch;text-wrap:pretty}
+.opts{display:grid;gap:8px}
+/* clique frequente: feedback instantâneo, sem coreografia */
+.opt{text-align:left;background:var(--bg);border:1.5px solid var(--line);border-radius:var(--r-m);padding:13px 16px;font-size:1rem;display:flex;gap:12px;align-items:flex-start;transition:border-color .12s,background-color .12s}
+.opt .k{font-family:var(--mono);font-weight:600;color:var(--muted);flex:none;width:1.2em}
+.opt:hover:not([disabled]){border-color:var(--primary)}
+.opt.ok{border-color:var(--ok);background:var(--ok-soft)}
+.opt.ok .k{color:var(--ok)}
+.opt.bad{border-color:var(--bad);background:var(--bad-soft)}
+.opt.bad .k{color:var(--bad)}
+.opt[disabled]{cursor:default}
+.expl{margin-top:16px;padding:14px 16px;border-radius:var(--r-m);background:var(--bg);border:1px solid var(--line);font-size:.97rem;max-width:70ch;animation:panelIn .22s var(--ease-out)}
+.expl b.ok{color:var(--ok)} .expl b.bad{color:var(--bad)}
+.qnav{display:flex;justify-content:space-between;gap:10px;margin-top:22px;flex-wrap:wrap}
+.dnd{display:grid;gap:14px}
+.pool{min-height:58px;border:1.5px dashed var(--line);border-radius:var(--r-m);padding:10px;display:flex;flex-wrap:wrap;gap:8px;align-content:flex-start;background:var(--bg)}
+.pool.empty::after{content:"Tudo encaixado. Confira e clique em Verificar.";color:var(--muted);font-size:.875rem;padding:6px}
+.chip{touch-action:none;user-select:none;-webkit-user-select:none;background:var(--primary-soft);color:var(--ink);border:1.5px solid var(--primary);border-radius:var(--r-s);padding:8px 12px;font-size:.95rem;line-height:1.3;max-width:100%;cursor:grab;text-align:left;transition:box-shadow .12s,transform .12s var(--ease-out)}
+.chip:active{cursor:grabbing}
+.chip.sel{box-shadow:0 0 0 3px var(--bg),0 0 0 5px var(--primary);transform:translateY(-1px)}
+.chip.ok{background:var(--ok-soft);border-color:var(--ok)}
+.chip.bad{background:var(--bad-soft);border-color:var(--bad)}
+.slots{display:grid;gap:8px}
+.slot-row{display:grid;grid-template-columns:minmax(120px,36%) minmax(0,1fr);gap:10px;align-items:stretch}
+@media (max-width:560px){.slot-row{grid-template-columns:minmax(0,1fr)}}
+.slot-label{background:var(--surface2);border-radius:var(--r-s);padding:10px 12px;font-weight:600;font-size:.95rem;display:flex;align-items:center;gap:8px}
+.slot-label .n{font-family:var(--mono);color:var(--primary-ink)}
+.dz{border:1.5px dashed var(--line);border-radius:var(--r-s);min-height:46px;padding:6px;display:flex;flex-wrap:wrap;gap:6px;align-items:center;background:var(--bg);transition:background-color .12s,border-color .12s}
+.dz.hover{border-color:var(--primary);background:var(--primary-soft)}
+.buckets{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px}
+.bucket{border:1px solid var(--line);border-radius:var(--r-m);padding:10px;background:var(--surface2)}
+.bucket h5{margin:0 0 8px;font-size:.95rem}
+.bucket .dz{min-height:90px;align-content:flex-start}
+.ghost{position:fixed;pointer-events:none;z-index:var(--z-drag);opacity:.95;transform:translate(-50%,-50%) rotate(-2deg) scale(1.03);box-shadow:0 12px 28px oklch(0.2 0.02 175 / .28)}
+.summary{text-align:left}
+.score-big{font-size:clamp(3.5rem,9vw,6rem);font-weight:800;letter-spacing:-.035em;line-height:1;font-variant-numeric:tabular-nums}
+.per{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:0;margin:20px 0;border:1px solid var(--line);border-radius:var(--r-m);overflow:hidden}
+.per div{padding:12px;border-right:1px solid var(--line);border-bottom:1px solid var(--line);background:var(--bg)}
+.per b{display:block;font-size:1.35rem;font-variant-numeric:tabular-nums}
+footer{max-width:1120px;margin:0 auto;padding:32px 20px 64px;color:var(--muted);font-size:.875rem}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+@media (prefers-reduced-motion: reduce){
+  html{scroll-behavior:auto}
+  *,*::before,*::after{animation-duration:.01ms!important;animation-delay:0ms!important;transition-duration:.01ms!important}
+  .tok,.deriv div{opacity:1;transform:none;filter:none}
+  .flip-in{transition:none}
+}
+</style>
+</head>
+<body>
+
+<header class="hero" id="topo">
+  <div class="hero-inner">
+    <div class="hero-top">
+      <span>Paradigmas de Linguagens de Programação · Profª Fernanda · ULBRA</span>
+      <button class="theme-btn" id="themeBtn" type="button">Alternar tema</button>
+    </div>
+    <h1>Compila a matéria antes da prova.</h1>
+    <p class="lede">Tudo das Aulas 1 a 6 explicado do zero, com peças para mexer e um simulado de 84 questões de marcar e de arrastar. Abaixo, uma linha de código passando pelo compilador, o mesmo caminho que a matéria faz.</p>
+    <div class="hero-cta">
+      <a class="btn btn-primary" href="#fio">Começar a estudar</a>
+      <a class="btn btn-ghost" href="#simulado">Ir direto ao simulado</a>
+    </div>
+
+    <div class="machine" aria-label="Demonstração do compilador">
+      <div class="machine-bar">
+        <div class="row" style="gap:12px"><span class="dots"><i></i><i></i><i></i></span><span class="fname">media.c</span></div>
+        <div class="stages" role="group" aria-label="Fases">
+          <button class="stage-btn" data-stage="0" type="button">1 Léxico</button>
+          <button class="stage-btn" data-stage="1" type="button">2 Sintático</button>
+          <button class="stage-btn" data-stage="2" type="button">3 Semântico</button>
+          <button class="stage-btn" data-stage="3" type="button">4 Resultado</button>
+          <button class="stage-btn" id="replay" type="button">▶ Compilar de novo</button>
+        </div>
+      </div>
+      <div class="source">media = (g1 * 2 + g2 * 3) / 5; <span class="cm">// fórmula da MP</span></div>
+      <div class="stage-view" id="stageView" aria-live="polite"></div>
+    </div>
+  </div>
+</header>
+
+<nav class="mnav" aria-label="Seções">
+  <a href="#fio">O fio</a><a href="#a1">Aula 1</a><a href="#a2">Aula 2</a><a href="#a3">Aula 3</a><a href="#a4">Aula 4</a><a href="#a5">Aula 5</a><a href="#a6">Aula 6</a><a href="#confusoes">Confusões</a><a href="#simulado">Simulado</a>
+</nav>
+
+<div class="layout">
+  <aside class="toc" aria-label="Sumário">
+    <ol id="tocList">
+      <li><a href="#fio">O fio que liga tudo</a></li>
+      <li><a href="#a1">Aula 1 · Linguagens e paradigmas</a></li>
+      <li><a href="#a2">Aula 2 · Critérios e gerações</a></li>
+      <li><a href="#a3">Aula 3 · Sintaxe e BNF</a></li>
+      <li><a href="#a4">Aula 4 · Semântica formal</a></li>
+      <li><a href="#a5">Aula 5 · Abstração e binding</a></li>
+      <li><a href="#a6">Aula 6 · Compilação e interpretação</a></li>
+      <li><a href="#confusoes">Confusões clássicas</a></li>
+      <li><a href="#simulado">Simulado</a></li>
+    </ol>
+    <div class="progress">
+      <span style="font-size:13px;color:var(--muted)">Simulado</span>
+      <b id="tocScore">0/84</b>
+      <span style="font-size:13px;color:var(--muted)" id="tocAcc">nenhuma respondida</span>
+      <div class="bar"><i id="tocBar"></i></div>
+    </div>
+  </aside>
+
+<main>
+
+<!-- ============ FIO ============ -->
+<section class="aula" id="fio">
+  <div class="aula-head"><h2>O fio que liga tudo</h2></div>
+  <p class="aula-intro">Antes das aulas uma por uma, a ideia que conecta todas. Se entender isto, metade da prova vira consequência.</p>
+  <p>Uma linguagem de programação tem <strong>forma</strong> (sintaxe) e <strong>significado</strong> (semântica). O programador escreve na forma; o computador precisa chegar no significado. Quem faz essa ponte é o <strong>processo de tradução</strong> (compilação ou interpretação). Os <strong>critérios de avaliação</strong> julgam se a linguagem faz isso bem, e os <strong>paradigmas</strong> são os jeitos diferentes de pensar ao escrever.</p>
+  <div class="memo"><strong>Frase para guardar:</strong> a Aula 06 é a Aula 03 e a Aula 04 acontecendo dentro do compilador. As regras léxicas viram o analisador léxico, a gramática (BNF) vira o analisador sintático, e a semântica estática vira o analisador semântico.</div>
+</section>
+
+<!-- ============ AULA 01 ============ -->
+<section class="aula" id="a1">
+  <div class="aula-head"><span class="aula-num">Aula 1 de 6</span><h2>O que é linguagem e o que é paradigma</h2></div>
+  <p class="aula-intro">A base do vocabulário da disciplina. Questões daqui costumam ser de definição direta.</p>
+
+  <div class="def"><b>Linguagem de programação</b> é um conjunto de termos e regras que permite dar instruções a um computador. Tem dois elementos: o <strong>vocabulário</strong> (conjunto de símbolos) e a <strong>gramática</strong> (regras para usar o vocabulário).</div>
+  <ul class="clean">
+    <li><strong>Algoritmo:</strong> regras e procedimentos lógicos, bem definidos, que resolvem um problema em um número <em>finito</em> de etapas.</li>
+    <li><strong>Programa:</strong> conjunto completo de comandos estruturados que especifica um algoritmo.</li>
+    <li><strong>Linguagem (em geral):</strong> veículo para expressar pensamentos; convenções e regras para trocar informações.</li>
+  </ul>
+
+  <h3>Os 4 componentes da comunicação em uma LP</h3>
+  <div class="table-wrap"><table class="t">
+    <tr><th>Componente</th><th>Papel</th></tr>
+    <tr><td><strong>Pessoa</strong></td><td>Programador ou usuário, a origem de toda a comunicação</td></tr>
+    <tr><td><strong>Problema</strong></td><td>A atividade, sistema ou ambiente real que motiva a comunicação</td></tr>
+    <tr><td><strong>Processo</strong></td><td>A atividade descrita de forma lógica pela pessoa</td></tr>
+    <tr><td><strong>Computador</strong></td><td>A máquina que executa o processo descrito no programa</td></tr>
+  </table></div>
+  <div class="memo">Para memorizar: a <strong>pessoa</strong> tem um <strong>problema</strong>, descreve um <strong>processo</strong>, e o <strong>computador</strong> executa.</div>
+
+  <h3>Características e requisitos</h3>
+  <p><strong>Características:</strong> são voltadas para descrever algoritmos, são implementáveis nos computadores e têm gramática e significado bem definidos, sem sentenças de significado duvidoso.</p>
+  <p><strong>Requisitos:</strong> todo problema resolvível por computador precisa ter solução programável na linguagem; ela precisa ser implementável; deve ser natural para expressar problemas do seu domínio; e precisa ter implementação com eficiência aceitável.</p>
+
+  <h3>Paradigma</h3>
+  <p>Do grego <em>paradeigma</em>: <strong>modelo, padrão</strong>. Em LP, é o modo como uma linguagem modela o que é um programa. A analogia da aula: para esquentar água você pode usar chaleira, fogão ou micro-ondas. O objetivo é o mesmo, o esforço e o jeito de pensar mudam.</p>
+  <p>Por que estudar paradigmas: entender melhor a linguagem que você já usa, usá-la melhor, escolher a linguagem certa para cada tarefa, aprender linguagens novas com mais facilidade e facilitar o projeto de linguagens.</p>
+
+  <div class="widget">
+    <p class="widget-title">Os 6 paradigmas</p>
+    <p class="widget-hint">Tente lembrar a definição antes de virar cada carta.</p>
+    <div class="flip-grid" id="flipGrid"></div>
+  </div>
+  <div class="trap"><strong>Pegadinha:</strong> o paradigma lógico é <em>derivado do declarativo</em>, não do funcional.</div>
+  <p style="font-size:15px;color:var(--muted)">Dado de mercado citado em aula (GitHub Octoverse 2025): o TypeScript ultrapassou Python e JavaScript em crescimento, e quase 80% dos novos repositórios usaram apenas seis linguagens. Para popularidade, a aula indica o índice TIOBE.</p>
+</section>
+
+<!-- ============ AULA 02 ============ -->
+<section class="aula" id="a2">
+  <div class="aula-head"><span class="aula-num">Aula 2 de 6</span><h2>Critérios de avaliação e gerações</h2></div>
+  <p class="aula-intro">Os quatro critérios do Sebesta e o que influencia cada um. É o assunto com mais cara de prova discursiva.</p>
+
+  <div class="widget">
+    <p class="widget-title">Explorador de critérios</p>
+    <p class="widget-hint">Escolha um critério para ver a definição e o que o afeta.</p>
+    <div class="seg" id="critSeg" role="group" aria-label="Critérios"></div>
+    <div class="panel" id="critPanel"></div>
+  </div>
+
+  <div class="trap"><strong>Por que a legibilidade é a mais importante?</strong> Desde os anos 1970 se percebeu que o código é lido e modificado muito mais vezes do que escrito. A manutenção virou a maior fatia do custo (de 2 a 4 vezes o desenvolvimento), e é a legibilidade que barateia a manutenção.</div>
+
+  <h3>Os conceitos que mais confundem</h3>
+  <ul class="clean">
+    <li><strong>Simplicidade global:</strong> poucas construções básicas, poucas formas de fazer a mesma coisa. Em C há quatro jeitos de somar 1: <code>count = count + 1</code>, <code>count += 1</code>, <code>count++</code>, <code>++count</code> (multiplicidade de recursos). A sobrecarga de operadores também atrapalha. Simples demais também é ruim: o <em>assembly</em> é simples e ilegível.</li>
+    <li><strong>Ortogonalidade:</strong> a regra vale igual para tudo, sem exceção, como LEGO, em que toda peça encaixa em toda peça. Quebra clássica em C: função não retorna vetor, mas retorna struct que contém vetor. Ortogonalidade em excesso também é ruim (ALGOL 68).</li>
+    <li><strong>Expressividade:</strong> dizer mais com menos. <code>count++</code> em vez de <code>count = count + 1</code>; o <code>for</code> em vez do <code>while</code> para contar.</li>
+    <li><strong>Suporte à abstração:</strong> usar estruturas complexas ignorando detalhes. Abstração de processo (subprogramas) e de dados (classes, tipos abstratos).</li>
+    <li><strong>Verificação de tipos:</strong> melhor em tempo de compilação, porque quanto mais cedo o erro aparece, mais barato é corrigir.</li>
+    <li><strong>Tratamento de exceções:</strong> interceptar erros em execução e continuar. Java, C++, Python têm; C e Fortran não têm embutido.</li>
+    <li><strong>Aliasing (apelidos):</strong> dois nomes para a mesma memória. Muda por um, o outro muda escondido. Prejudica a confiabilidade.</li>
+  </ul>
+  <p>Critérios secundários: <strong>portabilidade</strong> (mover entre plataformas), <strong>manutenibilidade</strong>, <strong>reusabilidade</strong> e <strong>eficiência</strong>.</p>
+
+  <div class="widget">
+    <p class="widget-title">Linha do tempo das gerações</p>
+    <p class="widget-hint">Clique em cada geração.</p>
+    <div class="timeline" id="genLine" role="group" aria-label="Gerações"></div>
+    <div class="panel" id="genPanel"></div>
+  </div>
+</section>
+
+<!-- ============ AULA 03 ============ -->
+<section class="aula" id="a3">
+  <div class="aula-head"><span class="aula-num">Aula 3 de 6</span><h2>Sintaxe, gramática e BNF</h2></div>
+  <p class="aula-intro">Sintaxe é a forma. Semântica é o significado. Descrever a sintaxe é mais fácil do que descrever a semântica.</p>
+
+  <h3>Duas camadas de regras</h3>
+  <div class="table-wrap"><table class="t">
+    <tr><th></th><th>Regras léxicas</th><th>Regras sintáticas</th></tr>
+    <tr><td><strong>Cuidam de</strong></td><td>Como os caracteres formam <strong>palavras (tokens)</strong></td><td>Como as palavras se <strong>combinam em frases</strong> válidas</td></tr>
+    <tr><td><strong>No português</strong></td><td>"cachorrro": a palavra não existe</td><td>"cachorro o latiu": palavras certas, ordem errada</td></tr>
+    <tr><td><strong>Exemplo da aula</strong></td><td>Pascal não diferencia maiúsculas de minúsculas</td><td>Estrutura de um <code>if</code> ou <code>for</code> em Python</td></tr>
+  </table></div>
+  <p>A semântica vem depois: "o gato bebeu a montanha" tem sintaxe perfeita e não faz sentido.</p>
+  <p><strong>Sintaxe abstrata × concreta:</strong> <code>while (x != y) { }</code> em C e <code>while x &lt;&gt; y do begin end</code> em Pascal têm a mesma estrutura (sintaxe abstrata) com símbolos diferentes (sintaxe concreta).</p>
+
+  <h3>Gramática e BNF</h3>
+  <p>A <strong>gramática</strong> é o manual de regras finitas que define a sintaxe. A notação mais usada é a <strong>BNF (Backus-Naur Form)</strong>, criada por <strong>John Backus e Peter Naur</strong> para definir o <strong>ALGOL 60</strong>.</p>
+  <div class="table-wrap"><table class="t">
+    <tr><th>Elemento</th><th>O que é</th><th>Exemplo</th></tr>
+    <tr><td><strong>Terminal</strong></td><td>"Átomo" indivisível; aparece literalmente no código</td><td><code>"if"</code> <code>"+"</code> <code>"8"</code> <code>";"</code></td></tr>
+    <tr><td><strong>Não-terminal</strong></td><td>Nome de um conjunto de possibilidades, entre <code>&lt; &gt;</code></td><td><code>&lt;expressao&gt;</code> <code>&lt;variavel&gt;</code></td></tr>
+    <tr><td><strong>Regra de produção</strong></td><td>Diz como um não-terminal se expande</td><td><code>&lt;nt&gt; ::= definição</code></td></tr>
+  </table></div>
+  <p>Metassímbolos: <code>&lt; &gt;</code> envolve não-terminal · <code>::=</code> "é definido como" · <code>|</code> "ou" · <code>" "</code> envolve terminal · <strong>recursão</strong> quando a regra chama a si mesma para permitir repetição.</p>
+  <p><strong>EBNF</strong> (estendida) acrescenta <code>( )</code> para escolha entre opções e <code>{ }</code> para <strong>zero ou mais repetições</strong>: <code>&lt;id&gt; -&gt; letra { letra | digito }</code>.</p>
+
+  <div class="widget">
+    <p class="widget-title">Derivador de números inteiros</p>
+    <p class="widget-hint">Regra: <code>&lt;inteiro&gt; ::= &lt;digito&gt; | &lt;digito&gt; &lt;inteiro&gt;</code>. Digite um número e veja a recursão expandindo.</p>
+    <div class="row"><input class="input" id="derivIn" value="425" inputmode="numeric" aria-label="Número"><button class="btn-s" id="derivBtn" type="button">Derivar</button></div>
+    <div class="deriv" id="derivOut"></div>
+  </div>
+
+  <div class="widget">
+    <p class="widget-title">Testador de identificador</p>
+    <p class="widget-hint">Regra: <code>&lt;id&gt; ::= &lt;letra&gt; | &lt;id&gt; &lt;letra&gt; | &lt;id&gt; &lt;digito&gt;</code>. Teste nomes como <code>nota1</code>, <code>1nota</code>, <code>g_1</code>.</p>
+    <div class="row"><input class="input" id="idIn" value="nota1" aria-label="Identificador"><button class="btn-s" id="idBtn" type="button">Testar</button></div>
+    <div id="idOut"></div>
+  </div>
+
+  <div class="memo"><strong>Respostas do duelo em aula, vale decorar:</strong><br>
+  <code>&lt;digito&gt; ::= "0" | "1" | … | "9"</code><br>
+  <code>&lt;vogal&gt; ::= "a" | "e" | "i" | "o" | "u"</code><br>
+  <code>&lt;booleano&gt; ::= "true" | "false"</code><br>
+  <code>&lt;coordenada&gt; ::= "(" &lt;digito&gt; "," &lt;digito&gt; ")"</code></div>
+</section>
+
+<!-- ============ AULA 04 ============ -->
+<section class="aula" id="a4">
+  <div class="aula-head"><span class="aula-num">Aula 4 de 6</span><h2>Semântica e seus três tipos formais</h2></div>
+  <p class="aula-intro">A semântica determina o significado de cada instrução. Regras sintáticas dizem como formar um comando; a semântica diz o efeito dele.</p>
+
+  <div class="def"><b>Sintaticamente correto, semanticamente incorreto:</b> <code>int idade = "Ana";</code> em C está bem escrito (tipo, nome, =, valor, ;) mas não faz sentido: texto numa variável numérica. Esse problema de atribuição e tipos é resolvido pela <strong>semântica estática</strong>, em tempo de compilação.</div>
+
+  <h3>Conceitos básicos</h3>
+  <ul class="clean">
+    <li><strong>Variável:</strong> região de memória usada para guardar dados, referenciada por um nome.</li>
+    <li><strong>Valor × referência:</strong> a variável guarda o conteúdo em si (valor) ou o endereço de outro lugar da memória (referência).</li>
+    <li><strong>Amarração (binding):</strong> atributos das entidades. Variável: nome, tipo, valor, escopo. Parâmetro: nome, tipo, tipo de passagem (por valor ou por referência).</li>
+    <li><strong>Recursão:</strong> uma unidade chama a si mesma (direta ou indiretamente); uma nova ativação começa antes de a anterior terminar. Exemplo: fatorial.</li>
+  </ul>
+
+  <div class="widget">
+    <p class="widget-title">As três semânticas no laço do seu grupo (Smalltalk)</p>
+    <p class="widget-hint">Mesmo código, três jeitos de dizer o que ele significa.</p>
+<pre>| contador |
+contador := 0.
+[ contador &lt; 10 ] whileTrue: [ contador := contador + 1 ].</pre>
+    <div class="seg" id="semSeg" role="group" aria-label="Tipo de semântica"></div>
+    <div id="semPanel"></div>
+  </div>
+
+  <div class="table-wrap"><table class="t">
+    <tr><th>Semântica</th><th>Pergunta</th><th>Visão</th><th>Exemplo da aula</th></tr>
+    <tr><td><strong>Operacional</strong></td><td>Como executa? Que operações acontecem?</td><td>Executor</td><td><code>for</code> do C reescrito com <code>if</code> e <code>goto</code></td></tr>
+    <tr><td><strong>Axiomática</strong></td><td>Que proposições lógicas são válidas?</td><td>Auditor</td><td><code>{x &gt; 10} soma = 2*x + 1 {soma &gt; 1}</code></td></tr>
+    <tr><td><strong>Denotacional</strong></td><td>Que objeto matemático o programa denota?</td><td>Matemático</td><td>Número binário tem como significado seu decimal</td></tr>
+  </table></div>
+  <ul class="clean">
+    <li><strong>Pré-condição:</strong> asserção que vem imediatamente antes da instrução e descreve as variáveis naquele ponto. Pode haver várias possíveis ({x&gt;10}, {x&gt;100}…).</li>
+    <li><strong>Pós-condição:</strong> asserção logo depois da instrução; descreve as novas restrições. Corresponde ao <strong>resultado desejado</strong>.</li>
+    <li>Asserções também se chamam <strong>predicados</strong> e ficam entre <code>{ }</code>. A forma <code>{P} C {Q}</code> é a <strong>tripla de Hoare</strong>.</li>
+    <li>A denotacional serve para provar a correção de programas, projetar linguagens e gerar compiladores automaticamente.</li>
+  </ul>
+</section>
+
+<!-- ============ AULA 05 ============ -->
+<section class="aula" id="a5">
+  <div class="aula-head"><span class="aula-num">Aula 5 de 6</span><h2>Abstração e amarração de dados</h2></div>
+  <p class="aula-intro">Abstração é quanto detalhe você esconde. Amarração é quando e como os atributos de algo são definidos.</p>
+
+  <h3>Abstração</h3>
+  <p>Conceito humano ligado à capacidade de detalhar algo. <strong>Alto nível</strong> = poucos detalhes: o segurança joga basquete no instinto. <strong>Baixo nível</strong> = muitos detalhes: o zelador calcula parábola, altura da cesta, pressão da bola.</p>
+  <p>Na programação, abstração separa <strong>o que</strong> o programa faz de <strong>como</strong> ele é implementado: <em>esconde os detalhes de implementação</em>. Você usa <code>print("Hello world")</code> sem saber como ele funciona por dentro. Mas às vezes vale entender o interior: <code>mean()</code> do Python precisa de uma lista com dados, senão gera <code>StatisticsError</code>.</p>
+  <p><strong>Histórico:</strong> a primeira abstração das linguagens de alto nível foi a <strong>variável</strong>, representando posições de memória. Junto veio o <strong>tipo</strong>: a classe de valores que a variável pode assumir e o conjunto de operações sobre ela.</p>
+
+  <div class="widget">
+    <p class="widget-title">Camadas de abstração</p>
+    <p class="widget-hint">Cada camada oferece uma interface mais simples que a de baixo. Clique para ver o que cada uma esconde.</p>
+    <div class="duo">
+      <div class="layers" id="layers"></div>
+      <div class="panel" id="layerPanel"></div>
+    </div>
+  </div>
+
+  <h3>Amarração (binding)</h3>
+  <p>Entidades (como variáveis) têm <strong>atributos</strong> (nome, tipo, valor). Os valores dos atributos precisam ser definidos antes do uso, e essa definição é a <strong>amarração</strong>. As linguagens variam em três aspectos: <strong>quantos</strong> atributos são amarrados, <strong>quando</strong> a amarração ocorre (binding time) e a <strong>estabilidade</strong> (se ela pode mudar).</p>
+  <div class="table-wrap"><table class="t">
+    <tr><th></th><th>Estática</th><th>Dinâmica</th></tr>
+    <tr><td><strong>Quando</strong></td><td>Antes da execução (definição da linguagem, compilação)</td><td>Durante a execução</td></tr>
+    <tr><td><strong>Pode mudar?</strong></td><td>Não</td><td>Geralmente sim</td></tr>
+    <tr><td><strong>Exemplo da aula</strong></td><td>O tipo <code>int</code> amarrado às operações de inteiros na definição da linguagem (Fortran, Ada, C, C++)</td><td>Variável amarrada a um valor em execução, podendo mudar várias vezes</td></tr>
+  </table></div>
+  <div class="trap"><strong>Pegadinha:</strong> há casos em que a amarração é feita em tempo de execução e <em>não pode</em> ser alterada depois.</div>
+
+  <div class="widget">
+    <p class="widget-title">Tipo amarrado cedo × tipo amarrado tarde</p>
+    <p class="widget-hint">O mesmo erro, duas linguagens. Rode cada uma.</p>
+    <div class="duo">
+      <div><strong>C: tipo fixado na compilação</strong>
+<pre>int x = 5;
+x = "oi";</pre>
+        <button class="btn-s alt" data-run="c" type="button">Compilar</button>
+        <div class="out" id="runC" aria-live="polite"></div></div>
+      <div><strong>Python: tipo segue o valor</strong>
+<pre>x = 5
+x = "oi"
+print(x + 1)</pre>
+        <button class="btn-s alt" data-run="py" type="button">Executar</button>
+        <div class="out" id="runPy" aria-live="polite"></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ AULA 06 ============ -->
+<section class="aula" id="a6">
+  <div class="aula-head"><span class="aula-num">Aula 6 de 6</span><h2>Compilação e interpretação</h2></div>
+  <p class="aula-intro">A diferença principal está no <strong>momento</strong> e no <strong>modo</strong> em que o código vira instruções executáveis.</p>
+
+  <div class="cmp">
+    <div><h4>Compiladas</h4><span class="ex">C · C++ · Rust · Go</span>
+      <p style="font-size:15px;margin:8px 0 0">Tradução completa <strong>antes</strong> de rodar. Gera um executável independente, com alta performance, que roda direto no SO e no hardware.</p></div>
+    <div><h4>Interpretadas</h4><span class="ex">Python · JavaScript · Ruby · PHP</span>
+      <p style="font-size:15px;margin:8px 0 0">Tradução instrução por instrução <strong>durante</strong> a execução. Flexíveis, multiplataforma, fáceis de testar. Se dá erro, a execução <strong>para naquela linha</strong>.</p></div>
+    <div><h4>Híbridas</h4><span class="ex">Java · C#</span>
+      <p style="font-size:15px;margin:8px 0 0">Compilam para <strong>bytecode</strong>. Em execução, a <strong>máquina virtual</strong> usa um interpretador ou um compilador <strong>JIT</strong> (just in time) para gerar as instruções da máquina local.</p></div>
+  </div>
+
+  <h3>As fases da compilação</h3>
+  <p>Divididas em <strong>análise</strong> (léxica, sintática, semântica) e <strong>síntese</strong> (código intermediário, otimização, geração de código).</p>
+  <div class="widget">
+    <p class="widget-title">Percorra as fases</p>
+    <p class="widget-hint">Clique em cada etapa. Usamos a linha do topo da página: <code>media = (g1 * 2 + g2 * 3) / 5; // fórmula da MP</code></p>
+    <div class="pipe" id="pipe" role="group" aria-label="Fases da compilação"></div>
+    <div class="panel" id="pipePanel"></div>
+  </div>
+  <div class="trap"><strong>Três pegadinhas:</strong> o léxico <em>ignora comentários</em>; a otimização é <em>opcional</em>; a tabela de símbolos é <em>preenchida pelo léxico e pelo sintático e usada pelo semântico</em>.</div>
+  <p>Ao final, o programa em linguagem de máquina pode rodar direto no hardware, mas às vezes precisa ser <strong>vinculado a programas do sistema operacional</strong> (por exemplo, para entrada e saída) antes de executar.</p>
+  <p><strong>No interpretador</strong> (atividade do mural): o código-fonte é lido como fluxo de caracteres e agrupado em tokens (análise léxica), a estrutura é verificada (análise sintática), e em seguida cada instrução é executada diretamente, sem gerar arquivo de máquina, produzindo o resultado na hora.</p>
+</section>
+
+<!-- ============ CONFUSÕES ============ -->
+<section class="aula" id="confusoes">
+  <div class="aula-head"><h2>Confusões clássicas</h2></div>
+  <p class="aula-intro">Pares que parecem iguais e que a prova adora trocar.</p>
+  <div class="table-wrap"><table class="t">
+    <tr><th>Conceito</th><th>Pergunta que responde</th></tr>
+    <tr><td><strong>Ortogonalidade</strong></td><td>As regras valem igual para tudo, sem exceção?</td></tr>
+    <tr><td><strong>Portabilidade</strong></td><td>O programa roda em outra máquina ou sistema?</td></tr>
+    <tr><td><strong>Reusabilidade</strong></td><td>O código pode ser reaproveitado em outro programa?</td></tr>
+    <tr><td><strong>Simplicidade</strong></td><td>Há poucas peças e poucas formas de fazer a mesma coisa?</td></tr>
+    <tr><td><strong>Abstração</strong></td><td>Os detalhes do "como" ficam escondidos?</td></tr>
+    <tr><td><strong>Expressividade</strong></td><td>Dá para dizer mais com menos código?</td></tr>
+    <tr><td><strong>Erro léxico</strong></td><td>A palavra (token) é inválida?</td></tr>
+    <tr><td><strong>Erro sintático</strong></td><td>As palavras estão combinadas na estrutura errada?</td></tr>
+    <tr><td><strong>Erro semântico</strong></td><td>Está bem escrito, mas o significado não faz sentido (ex.: tipo)?</td></tr>
+  </table></div>
+</section>
+
+<!-- ============ SIMULADO ============ -->
+<section id="simulado">
+  <div class="aula-head"><h2>Simulado</h2></div>
+  <p class="aula-intro">84 questões de marcar, verdadeiro ou falso e arrastar. No celular, arraste com o dedo ou toque na peça e depois no espaço. Seu progresso fica salvo neste navegador.</p>
+  <div class="quiz-shell">
+    <div class="qbar"><span>Filtrar por aula</span><span id="qCount"></span></div>
+    <div class="filters" id="filters" role="group" aria-label="Filtros"></div>
+    <div class="bar"><i id="qBar"></i></div>
+    <div id="quiz" class="qcard" aria-live="polite"></div>
+  </div>
+</section>
+
+</main>
+</div>
+<footer>Material de estudo baseado nos slides das Aulas 01 a 06 da Profª Fernanda Pereira Gomes e em Sebesta, <em>Conceitos de Linguagens de Programação</em>. Revise o que for do seu jeito antes da prova.</footer>
+
+<script>
+(function(){
+"use strict";
+const $=(s,r=document)=>r.querySelector(s), $$=(s,r=document)=>Array.from(r.querySelectorAll(s));
+const esc=s=>String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+const reduce=window.matchMedia&&matchMedia("(prefers-reduced-motion: reduce)").matches;
+const store={get(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
+
+/* theme */
+const root=document.documentElement;
+const savedTheme=store.get("pg1-theme",null); if(savedTheme) root.setAttribute("data-theme",savedTheme);
+$("#themeBtn").addEventListener("click",()=>{
+  const cur=root.getAttribute("data-theme")||(matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light");
+  const nx=cur==="dark"?"light":"dark"; root.setAttribute("data-theme",nx); store.set("pg1-theme",nx);
+});
+
+/* ---------- HERO MACHINE ---------- */
+const TOKS=[["media","id","identificador"],["=","op","operador"],["(","pt","pontuação"],["g1","id","identificador"],["*","op","operador"],["2","num","número"],["+","op","operador"],["g2","id","identificador"],["*","op","operador"],["3","num","número"],[")","pt","pontuação"],["/","op","operador"],["5","num","número"],[";","pt","pontuação"],["// fórmula da MP","cmt","comentário: ignorado"]];
+const TREE={l:"=",c:[{l:"media",t:"id"},{l:"/",c:[{l:"+",c:[{l:"*",c:[{l:"g1",t:"id"},{l:"2",t:"num"}]},{l:"*",c:[{l:"g2",t:"id"},{l:"3",t:"num"}]}]},{l:"5",t:"num"}]}]};
+function treeEl(n){const d=document.createElement("div");d.className="node "+(n.c?"op":(n.t==="id"?"leaf-id":"leaf-num"));const s=document.createElement("span");s.className="lbl";s.textContent=n.l;d.appendChild(s);if(n.c){const k=document.createElement("div");k.className="kids";n.c.forEach(c=>k.appendChild(treeEl(c)));d.appendChild(k)}return d}
+const STAGES=[
+ ()=>{let h='<p class="stage-title">Analisador léxico</p><p class="stage-desc">Lê os caracteres e agrupa em tokens: identificadores, palavras especiais, operadores e pontuação. O comentário é descartado.</p><div class="tokens">';
+   TOKS.forEach((t,i)=>{h+=`<div class="tok ${t[1]}" style="animation-delay:${reduce?0:i*60}ms"><b>${esc(t[0])}</b><small>${t[2]}</small></div>`});return h+"</div>"},
+ ()=>{const w=document.createElement("div");w.innerHTML='<p class="stage-title">Analisador sintático</p><p class="stage-desc">Com os tokens, monta a árvore de análise seguindo a gramática. Repare que * fica mais embaixo que +: a árvore já carrega a precedência.</p>';const t=document.createElement("div");t.className="tree";t.appendChild(treeEl(TREE));w.appendChild(t);return w},
+ ()=>'<p class="stage-title">Analisador semântico</p><p class="stage-desc">Consulta a tabela de símbolos para achar erros que a sintaxe não vê, como erros de tipo.</p><ul class="checks"><li><span>✓</span><span>media, g1 e g2 foram declaradas</span></li><li><span>✓</span><span>número * número → número</span></li><li><span>✓</span><span>resultado numérico cabe em media</span></li></ul><table class="symtab"><tr><th>nome</th><th>tipo</th><th>escopo</th></tr><tr><td>media</td><td>float</td><td>main</td></tr><tr><td>g1</td><td>float</td><td>main</td></tr><tr><td>g2</td><td>float</td><td>main</td></tr></table>',
+ ()=>'<p class="stage-title">Otimização, geração de código e execução</p><p class="stage-desc">O código intermediário é otimizado (opcional), vira linguagem de máquina e o computador executa. Com g1 = 7 e g2 = 6:</p><div class="result">(7 × 2 + 6 × 3) / 5 = 32 / 5<span class="big">MP 6,4 · aprovado</span></div>'
+];
+let stage=-1, autoTimer=null;
+function showStage(i){stage=i;$$(".stage-btn[data-stage]").forEach(b=>b.setAttribute("aria-pressed",String(+b.dataset.stage===i)));const v=$("#stageView");const r=STAGES[i]();v.innerHTML="";if(typeof r==="string")v.innerHTML=r;else v.appendChild(r)}
+$$(".stage-btn[data-stage]").forEach(b=>b.addEventListener("click",()=>{clearInterval(autoTimer);showStage(+b.dataset.stage)}));
+function autoplay(){clearInterval(autoTimer);showStage(0);let i=0;if(reduce)return;autoTimer=setInterval(()=>{i++;if(i>3){clearInterval(autoTimer);return}showStage(i)},3200)}
+$("#replay").addEventListener("click",autoplay);
+autoplay();
+
+/* ---------- AULA 01 flip ---------- */
+const PARAD=[["Imperativo","também chamado procedural","Instruções passadas ao computador na sequência em que devem ser executadas.","Ex.: C, Pascal, PHP"],["Declarativo","o quê, não o como","Foca no que deve ser resolvido, não em como fazer.","Ex.: SQL, Haskell"],["Funcional","funções em destaque","Problema dividido em blocos; funções definem variáveis no seu escopo e retornam um resultado.","Ex.: Haskell, Clojure, Lisp"],["Lógico","deriva do declarativo","Usa formas de lógica simbólica como padrão de entrada e saída.","Ex.: Prolog"],["Orientado a objetos","popular nos anos 90","Popularizado com o Java, que permitiu programar para várias plataformas da mesma maneira.","Ex.: Java, Smalltalk, C#"],["Orientado a eventos","recursos gráficos","Usado por linguagens com recursos gráficos, como jogos e formulários: o programa reage a eventos.","Ex.: JavaScript, Visual Basic"]];
+PARAD.forEach(p=>{const b=document.createElement("button");b.type="button";b.className="flip";b.setAttribute("aria-pressed","false");b.innerHTML=`<div class="flip-in"><div class="flip-face flip-front"><strong>${p[0]}</strong><small>${p[1]} · toque para virar</small></div><div class="flip-face flip-back"><span>${p[2]}</span><em>${p[3]}</em></div></div>`;b.addEventListener("click",()=>b.setAttribute("aria-pressed",String(b.getAttribute("aria-pressed")!=="true")));$("#flipGrid").appendChild(b)});
+
+/* ---------- AULA 02 criterios ---------- */
+const CRIT={"Legibilidade":["Facilidade com que programas podem ser lidos e entendidos. É o critério mais importante, e deve ser avaliado dentro do domínio do problema.",["Simplicidade global","Ortogonalidade","Instruções de controle","Sintaxe"],"Instruções de controle: while/if/for em vez de goto (fim do código espaguete). Sintaxe: nomes descritivos, palavras como end if do Ada, forma coerente com o significado."],
+"Capacidade de escrita":["Facilidade de usar a linguagem para criar programas em um domínio. Só faz sentido dentro do domínio (não se compara COBOL e Fortran fora do contexto).",["Simplicidade e ortogonalidade","Suporte à abstração","Expressividade"],"Abstração de processo (subprogramas) e de dados (classes). Expressividade: count++, list comprehension."],
+"Confiabilidade":["O programa se comporta de acordo com a especificação sob todas as condições.",["Verificação de tipos","Tratamento de exceções","Aliasing (apelidos)","Legibilidade e capacidade de escrita","Expressividade"],"Verificação de tipos em compilação é melhor: erro achado cedo custa menos. Aliasing é perigoso."],
+"Custo":["Traduz todos os outros critérios em termos econômicos.",["Treinar programadores","Escrever programas","Compilar e executar","Manter programas"],"Manter é o maior custo (2 a 4 vezes o desenvolvimento), por isso a legibilidade manda. Compiladores gratuitos ajudaram a difundir Java."]};
+function renderCrit(k){$$("#critSeg button").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.k===k)));const c=CRIT[k];$("#critPanel").innerHTML=`<h4>${k}</h4><p style="margin:0">${c[0]}</p><p style="margin:12px 0 0;font-weight:600;font-size:15px">O que afeta:</p><ul class="chips">${c[1].map(x=>`<li>${x}</li>`).join("")}</ul><p style="margin:12px 0 0;font-size:15px;color:var(--muted)">${c[2]}</p>`}
+Object.keys(CRIT).forEach(k=>{const b=document.createElement("button");b.type="button";b.textContent=k;b.dataset.k=k;b.addEventListener("click",()=>renderCrit(k));$("#critSeg").appendChild(b)});renderCrit("Legibilidade");
+
+const GEN=[["1ª","1950–60","Estruturas baseadas nos computadores da época. Instruções não aninhadas, dependência do GOTO, recursão não permitida na maioria.","Fortran, COBOL"],["2ª","ALGOL 60","Aperfeiçoamento da 1ª: estruturas de controle melhores, procedimentos recursivos e opções de passagem de parâmetros.","ALGOL 60"],["3ª","1970–80","Estruturas de dados organizadas de forma hierárquica; ênfase em simplicidade e eficiência; criação do laço for e do switch-case.","Pascal"],["4ª","consolidação","Consolidação e correção das características da 3ª geração.","Ada, Modula-3, CLU"],["5ª","experimentos","Surgem orientação a eventos e a objetos; três paradigmas principais: funcional, lógico e orientado a objetos.","Prolog (lógico)"],["6ª","atualidade","Várias linguagens importantes desenvolvidas e popularizadas.","Haskell, Python, Java, R, Lua, Delphi, JavaScript, PHP, Ruby"]];
+function renderGen(i){$$("#genLine button").forEach((b,j)=>b.setAttribute("aria-pressed",String(i===j)));const g=GEN[i];$("#genPanel").innerHTML=`<h4>${g[0]} geração</h4><p style="margin:0">${g[2]}</p><ul class="chips"><li>${g[3]}</li></ul>`}
+GEN.forEach((g,i)=>{const b=document.createElement("button");b.type="button";b.innerHTML=`${g[0]}<small>${g[1]}</small>`;b.addEventListener("click",()=>renderGen(i));$("#genLine").appendChild(b)});renderGen(0);
+
+/* ---------- AULA 03 widgets ---------- */
+function derive(){const v=$("#derivIn").value.trim();const out=$("#derivOut");if(!/^\d{1,8}$/.test(v)){out.innerHTML='<div class="verdict bad" style="opacity:1;animation:none">Digite só dígitos (até 8). Um inteiro, pela regra, só tem dígitos.</div>';return}
+ const steps=["&lt;inteiro&gt;"];let done="";for(let i=0;i<v.length;i++){const last=i===v.length-1;steps.push(esc(done)+(last?"&lt;digito&gt;":"&lt;digito&gt; &lt;inteiro&gt;"));done+=v[i];steps.push(esc(done)+(last?"":" &lt;inteiro&gt;"))}
+ out.innerHTML=steps.map((s,i)=>`<div style="animation-delay:${reduce?0:i*120}ms">${i?"⇒ ":""}${s}</div>`).join("")}
+$("#derivBtn").addEventListener("click",derive);$("#derivIn").addEventListener("keydown",e=>{if(e.key==="Enter")derive()});derive();
+function testId(){const v=$("#idIn").value;const o=$("#idOut");let msg,ok=false;
+ if(!v)msg="Vazio: a regra exige pelo menos uma &lt;letra&gt;.";
+ else if(!/^[A-Za-z]/.test(v))msg=`Inválido: começa com "${esc(v[0])}". Toda derivação de &lt;id&gt; começa em &lt;letra&gt;, então o primeiro caractere precisa ser letra.`;
+ else if(!/^[A-Za-z][A-Za-z0-9]*$/.test(v)){const bad=v.match(/[^A-Za-z0-9]/)[0];msg=`Inválido: "${esc(bad)}" não é &lt;letra&gt; nem &lt;digito&gt;, e a regra só permite acrescentar esses dois.`}
+ else{ok=true;msg=`Válido: começa com a letra "${esc(v[0])}"`+(v.length>1?` e a recursão acrescenta ${v.length-1} letra(s)/dígito(s).`:".")}
+ o.innerHTML=`<div class="verdict ${ok?"ok":"bad"}">${msg}</div>`}
+$("#idBtn").addEventListener("click",testId);$("#idIn").addEventListener("keydown",e=>{if(e.key==="Enter")testId()});testId();
+
+/* ---------- AULA 04 semantics ---------- */
+const SEM=["Operacional","Axiomática","Denotacional"];let semCount=0,semLog=[];
+function renderSem(k){$$("#semSeg button").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.k===k)));const p=$("#semPanel");
+ if(k==="Operacional"){p.innerHTML=`<p style="margin:0 0 12px">Visão do executor: acompanhar o estado da memória passo a passo.</p><div class="stepper"><div class="mem"><div style="color:var(--hero-muted);font-size:12px">contador</div><div class="cell" id="cell">${semCount}</div><div class="log" id="slog">${semLog.join("<br>")||"estado inicial: contador ← 0"}</div></div><div><div class="row"><button class="btn-s" id="stepB" type="button">Próximo passo</button><button class="btn-s alt" id="resetB" type="button">Reiniciar</button></div><p style="font-size:15px;color:var(--muted)">Cada passo avalia <code>contador &lt; 10</code>. Se for verdade, envia a mensagem <code>+ 1</code> e guarda o novo objeto. Quando for falso, o laço termina.</p></div></div>`;
+   $("#stepB").addEventListener("click",()=>{if(semCount<10){semLog.push(`${semCount} &lt; 10 → true · contador ← ${semCount+1}`);semCount++}else if(!semLog.join("").includes("false")){semLog.push("10 &lt; 10 → false · fim do laço")}renderSem("Operacional");const l=$("#slog");l.scrollTop=l.scrollHeight});
+   $("#resetB").addEventListener("click",()=>{semCount=0;semLog=[];renderSem("Operacional")});}
+ else if(k==="Axiomática"){p.innerHTML=`<p style="margin:0 0 12px">Visão do auditor: não importa o passo a passo, importa o que é garantidamente verdade antes e depois.</p><pre>{ contador = 0 }                       ← pré-condição
+[ contador &lt; 10 ] whileTrue: [ ... ]
+{ contador = 10 }                      ← pós-condição</pre><p style="font-size:15.5px">Invariante: <code>0 ≤ contador ≤ 10</code> vale em toda volta. O laço termina porque <code>10 − contador</code> diminui a cada volta. Isso é a tripla de Hoare <code>{P} C {Q}</code>.</p>`}
+ else{p.innerHTML=`<p style="margin:0 0 12px">Visão do matemático: o código é uma caixa preta, uma função de estado inicial para estado final.</p><pre>f(x) = 10   se x &lt; 10
+f(x) = x    caso contrário
+
+f(0) = 10</pre><p style="font-size:15.5px">Os passos intermediários somem. Só interessa a regra de entrada e saída.</p>`}}
+SEM.forEach(k=>{const b=document.createElement("button");b.type="button";b.textContent=k;b.dataset.k=k;b.addEventListener("click",()=>renderSem(k));$("#semSeg").appendChild(b)});renderSem("Operacional");
+
+/* ---------- AULA 05 layers ---------- */
+const LAY=[["Hardware","base","Não há abstração abaixo dela: é o nível físico, com bits, registradores e circuitos. Tudo acima existe para esconder esta camada."],["Sistema operacional","esconde o hardware","Você abre um arquivo e não pensa em setores do disco. O SO gerencia memória, processos e dispositivos e oferece chamadas de sistema."],["Bibliotecas e frameworks","esconde o SO","Funções prontas como print() ou mean(): você usa sem saber como falam com o SO."],["APIs","esconde implementações","Contratos de uso: você pede algo a um serviço e recebe a resposta, sem ver como ele foi feito."],["Aplicativos","esconde as APIs","O programa final junta tudo abaixo e expõe só telas e funções úteis."],["Usuários","nível mais alto","Vê botões e resultados. Máximo de abstração: nenhum detalhe técnico à vista."]];
+function renderLay(i){$$("#layers .layer").forEach(b=>b.setAttribute("aria-pressed",String(+b.dataset.i===i)));const l=LAY[i];$("#layerPanel").innerHTML=`<h4>${i+1}. ${l[0]}</h4><p style="margin:0">${l[2]}</p>`}
+LAY.forEach((l,i)=>{const b=document.createElement("button");b.type="button";b.className="layer";b.dataset.i=i;b.innerHTML=`<strong>${i+1}. ${l[0]}</strong><span>${l[1]}</span>`;b.addEventListener("click",()=>renderLay(i));$("#layers").appendChild(b)});renderLay(1);
+$$("[data-run]").forEach(b=>b.addEventListener("click",()=>{if(b.dataset.run==="c"){const o=$("#runC");o.className="out err";o.textContent="erro de compilação: atribuição de texto a variável int. O programa nem chega a rodar: o tipo foi amarrado antes da execução."}else{const o=$("#runPy");o.className="out err";o.textContent="x agora é 'oi' (a troca de tipo foi aceita). Erro só em execução, na linha do print: TypeError ao somar texto com número."}}));
+
+/* ---------- AULA 06 pipe ---------- */
+const PIPE=[["Código-fonte","Conjunto de instruções e declarações escritas por um programador em uma linguagem (a linguagem-fonte).","media = (g1 * 2 + g2 * 3) / 5; // fórmula da MP"],["Analisador léxico","Reúne os caracteres em unidades léxicas (tokens): identificadores, palavras especiais, operadores e pontuação. Ignora comentários. Também chamado scanner ou lexer.","[media] [=] [(] [g1] [*] [2] [+] [g2] [*] [3] [)] [/] [5] [;]  (comentário descartado)"],["Analisador sintático","Usa os tokens para construir a árvore de análise (parse tree), que representa a estrutura sintática do programa. Verifica se a estrutura segue a gramática.","= ( media , / ( + ( *(g1,2) , *(g2,3) ) , 5 ) )"],["Analisador semântico","Verifica erros difíceis ou impossíveis de detectar na análise sintática, como erros de tipo.","g1, g2 e media são numéricas → operação válida"],["Otimização","Melhora o programa tornando-o menor ou mais rápido. Função opcional.","Ex. da aula: 4 instruções com temporários viram 2"],["Tabela de símbolos","Banco de dados da compilação: tipos e atributos de cada nome definido no programa. Preenchida pelos analisadores léxico e sintático e usada pelo semântico.","media: float · g1: float · g2: float"],["Gerador de código","Converte o código intermediário otimizado em um programa equivalente em linguagem de máquina.","01100110 10011100 …"],["Computador","Executa o código de máquina: o processador interpreta as instruções e realiza as operações.","calcula (7·2 + 6·3) / 5"],["Resultados","Os efeitos observados na execução: saída na tela, arquivos modificados, interação com o usuário.","media = 6.4"]];
+function renderPipe(i){$$("#pipe button").forEach((b,j)=>b.setAttribute("aria-pressed",String(i===j)));const p=PIPE[i];const tag=i===4?'<span class="tag">opcional</span>':(i===5?'<span class="tag">consultada por várias fases</span>':"");$("#pipePanel").innerHTML=`<h4>${i+1}. ${p[0]}${tag}</h4><p style="margin:0">${p[1]}</p><pre>${esc(p[2])}</pre>`}
+PIPE.forEach((p,i)=>{const b=document.createElement("button");b.type="button";b.innerHTML=`<span class="n">${i+1}</span>${p[0]}`;b.addEventListener("click",()=>renderPipe(i));$("#pipe").appendChild(b)});renderPipe(1);
+
+/* ---------- TOC highlight ---------- */
+const secs=["fio","a1","a2","a3","a4","a5","a6","confusoes","simulado"].map(id=>document.getElementById(id));
+let tocTick=false;function tocActive(){tocTick=false;const y=innerHeight*0.35;let cur=secs[0];secs.forEach(sec=>{if(sec&&sec.getBoundingClientRect().top<=y)cur=sec});$$("#tocList a").forEach(a=>a.classList.toggle("on",a.getAttribute("href")==="#"+cur.id))}
+addEventListener("scroll",()=>{if(!tocTick){tocTick=true;requestAnimationFrame(tocActive)}},{passive:true});tocActive();
+
+/* =================== QUESTIONS =================== */
+const Q=[
+// Aula 01
+{a:1,t:"mc",q:"Quais são os dois elementos importantes de uma linguagem de programação?",o:["Vocabulário (símbolos) e gramática (regras)","Compilador e interpretador","Variáveis e funções","Sintaxe e hardware"],c:0,e:"Uma LP é formada por vocabulário (conjunto de símbolos) e gramática (conjunto de regras para usar o vocabulário)."},
+{a:1,t:"mc",q:"O que é um algoritmo?",o:["Um conjunto completo de comandos escritos em uma linguagem","Regras e procedimentos lógicos bem definidos que resolvem um problema em um número finito de etapas","Um veículo para expressar pensamentos","Um conjunto de símbolos de uma linguagem"],c:1,e:"Algoritmo é a solução lógica em etapas finitas. Programa é o conjunto de comandos que especifica um algoritmo."},
+{a:1,t:"match",q:"Associe cada componente da comunicação em uma LP ao seu papel.",p:[["Pessoa","Origem de toda a comunicação"],["Problema","Situação real que motiva a comunicação"],["Processo","Atividade descrita de forma lógica"],["Computador","Máquina que executa o que foi descrito"]],e:"A pessoa tem um problema, descreve um processo, e o computador executa."},
+{a:1,t:"mc",q:"A palavra 'paradigma' vem do grego paradeigma e significa:",o:["Linguagem","Modelo ou padrão","Tradução","Regra gramatical"],c:1,e:"Paradigma = modelo, padrão; algo que serve de exemplo a ser seguido."},
+{a:1,t:"mc",q:"Qual paradigma foca no 'o quê' deve ser resolvido, e não em 'como'?",o:["Imperativo","Orientado a eventos","Declarativo","Orientado a objetos"],c:2,e:"O declarativo descreve o que se quer; o imperativo descreve como, passo a passo."},
+{a:1,t:"vf",q:"O paradigma lógico é derivado do paradigma funcional.",c:false,e:"Falso. O lógico é derivado do declarativo e usa lógica simbólica como padrão de entrada e saída."},
+{a:1,t:"match",q:"Associe cada paradigma à sua descrição da aula.",p:[["Imperativo","Instruções na sequência em que devem ser executadas"],["Funcional","Funções definem variáveis no escopo e retornam resultado"],["Orientado a objetos","Popularizado nos anos 90 com Java"],["Orientado a eventos","Linguagens com recursos gráficos, como jogos e formulários"]],e:"Essas são as descrições usadas nos slides da Aula 01."},
+{a:1,t:"mc",q:"Qual item NÃO é um requisito de uma linguagem de programação segundo a aula?",o:["Ser implementável em um computador","Ser natural para expressar problemas de um domínio","Ter implementação com eficiência aceitável","Suportar apenas um paradigma"],c:3,e:"Os requisitos são: solução programável para todo problema resolvível, implementabilidade, naturalidade no domínio e eficiência aceitável. Nada exige um único paradigma."},
+{a:1,t:"vf",q:"Uma característica das LPs é ter gramática e significado bem definidos, sem permitir sentenças de significado duvidoso.",c:true,e:"Verdadeiro. Também são voltadas a descrever algoritmos e são implementáveis nos computadores."},
+{a:1,t:"mc",q:"Segundo o GitHub Octoverse 2025 citado em aula, qual linguagem ultrapassou Python e JavaScript em crescimento?",o:["Rust","Go","TypeScript","Kotlin"],c:2,e:"O TypeScript ultrapassou Python e JavaScript em crescimento."},
+{a:1,t:"mc",q:"Qual NÃO é um motivo para estudar paradigmas, segundo a aula?",o:["Facilitar o aprendizado de novas linguagens","Escolher a linguagem adequada para uma tarefa","Tornar mais fácil o projeto de uma linguagem","Dispensar a necessidade de testar programas"],c:3,e:"Os motivos: entender melhor a linguagem usada, usá-la melhor, escolher linguagens, aprender novas e facilitar o projeto de linguagens."},
+// Aula 02
+{a:2,t:"mc",q:"Segundo Sebesta, qual é o critério mais importante na avaliação de linguagens?",o:["Eficiência","Legibilidade","Capacidade de escrita","Custo de compilação"],c:1,e:"Legibilidade, porque a manutenção é a maior parte do custo do software e depende da facilidade de ler o código."},
+{a:2,t:"match",q:"Associe cada critério à sua definição.",p:[["Legibilidade","Facilidade de ler e entender programas"],["Capacidade de escrita","Facilidade de criar programas em um domínio"],["Confiabilidade","Comportar-se conforme a especificação em todas as condições"],["Custo","Treinar, escrever, compilar, executar e manter"]],e:"Os quatro critérios principais de Sebesta."},
+{a:2,t:"mc",q:"Dois ponteiros diferentes apontam para o mesmo endereço de memória. Esse recurso se chama:",o:["Ortogonalidade","Aliasing (apelidos)","Abstração","Sobrecarga de operadores"],c:1,e:"Aliasing: dois nomes acessam a mesma célula de memória. Prejudica a confiabilidade."},
+{a:2,t:"mc",q:"O que é ortogonalidade?",o:["Capacidade de rodar em várias plataformas","Poucas construções primitivas que se combinam de forma consistente, sem exceções","Esconder detalhes de implementação","Reaproveitar código em outros programas"],c:1,e:"Ortogonalidade = regras que valem igual para tudo. Rodar em várias plataformas é portabilidade; reaproveitar é reusabilidade."},
+{a:2,t:"mc",q:"Em C, uma função não pode retornar um vetor, mas pode retornar uma struct que contém um vetor. Isso exemplifica:",o:["Falta de ortogonalidade","Excesso de expressividade","Aliasing","Portabilidade"],c:0,e:"A mesma coisa é proibida de um jeito e permitida de outro: uma exceção, logo, quebra de ortogonalidade."},
+{a:2,t:"vf",q:"Quanto mais ortogonal, sempre melhor: ortogonalidade em excesso nunca é problema.",c:false,e:"Falso. O ALGOL 68 mostrou que liberdade total de combinação gera complexidade e combinações sem sentido."},
+{a:2,t:"mc",q:"C oferece count = count + 1, count += 1, count++ e ++count. Isso prejudica principalmente:",o:["A simplicidade global (multiplicidade de recursos)","A portabilidade","A verificação de tipos","O tratamento de exceções"],c:0,e:"Várias formas de fazer a mesma coisa obrigam o leitor a conhecer todas: prejudica a simplicidade."},
+{a:2,t:"mc",q:"Escrever count++ em vez de count = count + 1 é um exemplo de:",o:["Aliasing","Expressividade","Ortogonalidade","Amarração dinâmica"],c:1,e:"Expressividade: formas convenientes de especificar computações, dizendo mais com menos."},
+{a:2,t:"mc",q:"Qual é normalmente o maior componente do custo total de um software?",o:["Treinar programadores","Compilar","Manter os programas","Comprar o compilador"],c:2,e:"A manutenção pode custar de 2 a 4 vezes o desenvolvimento inicial."},
+{a:2,t:"mc",q:"Por que a verificação de tipos em tempo de compilação é desejável?",o:["Porque deixa o programa maior","Porque quanto mais cedo o erro é descoberto, mais barato é corrigi-lo","Porque elimina a necessidade de testes","Porque só funciona em linguagens interpretadas"],c:1,e:"Detectar em execução é caro e empurra o problema para o cliente."},
+{a:2,t:"vf",q:"C e Fortran possuem tratamento de exceções embutido na linguagem.",c:false,e:"Falso. Ada, C++, Java, C# e Python têm; C e Fortran não, o que é uma deficiência de confiabilidade."},
+{a:2,t:"order",q:"Ordene as gerações das linguagens da 1ª para a 6ª.",items:["Fortran e COBOL, com GOTO","ALGOL 60, com recursão","Pascal, com for e switch-case","Ada, Modula-3 e CLU","Experimentos: funcional, lógico e OO","Python, Java e JavaScript"],e:"1ª Fortran/COBOL · 2ª ALGOL 60 · 3ª Pascal · 4ª Ada/Modula-3/CLU · 5ª experimentos · 6ª linguagens atuais."},
+{a:2,t:"mc",q:"A geração que simplificou estruturas de controle com o laço for e o switch-case, simbolizada pelo Pascal, é a:",o:["1ª","2ª","3ª","5ª"],c:2,e:"3ª geração (1970–80): simplicidade e eficiência, simbolizada pelo Pascal."},
+{a:2,t:"mc",q:"Por que o assembly é citado como exemplo de que simplicidade demais atrapalha?",o:["Porque tem muitas formas de fazer a mesma coisa","Porque tem poucas instruções, mas exige longas sequências delas, ficando ilegível","Porque não pode ser compilado","Porque é orientado a objetos"],c:1,e:"Pouquíssimas construções obrigam a escrever muito para fazer qualquer coisa."},
+{a:2,t:"mc",q:"O Java define int como exatamente 32 bits em qualquer plataforma e compila para bytecode da JVM. Isso favorece:",o:["A portabilidade","O aliasing","A multiplicidade de recursos","A falta de ortogonalidade"],c:0,e:"Write once, run anywhere: o mesmo bytecode roda em qualquer sistema com JVM."},
+{a:2,t:"cls",q:"Classifique cada característica no critério que ela mais afeta, segundo a tabela de Sebesta.",cats:["Legibilidade","Capacidade de escrita","Confiabilidade"],items:[["Instruções de controle (fim do goto)",0],["Sintaxe (palavras especiais, nomes descritivos)",0],["Suporte à abstração",1],["Tratamento de exceções",2],["Aliasing",2],["Verificação de tipos",2]],e:"Instruções de controle e sintaxe afetam a legibilidade; abstração, a escrita; exceções, aliasing e tipos, a confiabilidade."},
+// Aula 03
+{a:3,t:"mc",q:"Qual a diferença entre sintaxe e semântica?",o:["Sintaxe é o significado; semântica é a forma","Sintaxe é a forma de construção dos programas; semântica é o significado das instruções","São sinônimos","Sintaxe só existe em linguagens compiladas"],c:1,e:"Sintaxe = como se escreve. Semântica = o que o código faz."},
+{a:3,t:"vf",q:"Descrever a semântica de uma linguagem é mais fácil do que descrever sua sintaxe.",c:false,e:"Falso. A aula afirma o contrário: descrever a sintaxe é mais fácil."},
+{a:3,t:"cls",q:"Classifique cada erro no tipo correto.",cats:["Léxico","Sintático","Semântico"],items:[["Palavra com caractere fora do alfabeto da linguagem",0],["Palavra que não pode ser formada pelas regras da linguagem",0],["Parêntese aberto e nunca fechado: if (x > 0 {",1],["Palavras válidas em ordem inválida: x = + ;",1],["int idade = \"Ana\"; em C",2],["Tipos incompatíveis em uma operação, com tudo bem escrito",2]],e:"Léxico: a palavra. Sintático: a estrutura. Semântico: o significado (tipos)."},
+{a:3,t:"mc",q:"As regras léxicas especificam:",o:["Como as palavras se combinam em sentenças","O conjunto de caracteres do alfabeto e como se combinam para formar palavras válidas","O significado de cada instrução","A ordem das fases do compilador"],c:1,e:"Léxicas = formação das palavras (tokens). Sintáticas = combinação das palavras."},
+{a:3,t:"mc",q:"Em Pascal não há diferença entre maiúsculas e minúsculas. Isso é uma regra:",o:["Sintática","Semântica","Léxica","Axiomática"],c:2,e:"Trata de como os caracteres formam palavras: regra léxica."},
+{a:3,t:"mc",q:"while (x != y) { } em C e while x <> y do begin end em Pascal. A aula conclui que:",o:["Têm a mesma sintaxe concreta","Têm a mesma sintaxe abstrata, mas diferem na sintaxe concreta","Têm semânticas opostas","Só o C é válido"],c:1,e:"A estrutura é a mesma (abstrata); os detalhes de baixo nível, os símbolos, mudam (concreta)."},
+{a:3,t:"mc",q:"A BNF foi criada por John Backus e Peter Naur para definir a sintaxe de qual linguagem?",o:["Fortran","C","ALGOL 60","Pascal"],c:2,e:"ALGOL 60, e depois virou o padrão na ciência da computação."},
+{a:3,t:"match",q:"Associe cada metassímbolo da BNF ao seu significado.",p:[["< >","Envolve um não-terminal"],["::=","É definido como"],["|","Escolha, OU"],["\" \"","Envolve um terminal"]],e:"Esses são os metassímbolos da 'cola' sintática da aula."},
+{a:3,t:"mc",q:"Na BNF, \"if\" e <expressao> são, respectivamente:",o:["Não-terminal e terminal","Terminal e não-terminal","Ambos terminais","Ambos não-terminais"],c:1,e:"Entre aspas: terminal (átomo literal). Entre < >: não-terminal (conjunto de possibilidades)."},
+{a:3,t:"mc",q:"Em <inteiro> ::= <digito> | <digito> <inteiro>, o que permite números de qualquer tamanho?",o:["As aspas","A recursão: a regra chama a si mesma","O símbolo ::=","Nada; só aceita um dígito"],c:1,e:"<inteiro> aparece dos dois lados: isso permite repetir dígitos."},
+{a:3,t:"mc",q:"Na EBNF, as chaves { } indicam:",o:["Um terminal","Uma escolha entre opções","Zero ou mais repetições","Um comentário"],c:2,e:"{ } = repetição indefinida (zero ou mais). ( ) = escolha entre opções."},
+{a:3,t:"mc",q:"Qual regra define corretamente uma vogal minúscula?",o:["<vogal> ::= a e i o u","<vogal> ::= \"a\" | \"e\" | \"i\" | \"o\" | \"u\"","\"vogal\" ::= <a> | <e> | <i> | <o> | <u>","<vogal> = \"aeiou\""],c:1,e:"Não-terminal entre < >, ::=, terminais entre aspas separados por |."},
+{a:3,t:"vf",q:"Com <id> ::= <letra> | <id> <letra> | <id> <digito>, o identificador 1nota é válido.",c:false,e:"Falso. Toda derivação começa em <letra>, então o primeiro caractere precisa ser letra."},
+{a:3,t:"mc",q:"Qual regra define uma coordenada no formato (5,2)?",o:["<coordenada> ::= \"(\" <digito> \",\" <digito> \")\"","<coordenada> ::= <digito> <digito>","<coordenada> ::= ( digito , digito )","\"coordenada\" ::= <(> <,> <)>"],c:0,e:"Parênteses e vírgula são terminais (aspas); os números vêm de <digito>."},
+{a:3,t:"mc",q:"Na notação de regra de produção, o lado esquerdo (LHS) contém:",o:["Somente terminais","Um símbolo não-terminal","O resultado da execução","Comentários"],c:1,e:"LHS: o não-terminal sendo definido. RHS: terminais e não-terminais."},
+// Aula 04
+{a:4,t:"mc",q:"O que a semântica de uma linguagem determina?",o:["A forma de escrever os comandos","O significado de cada instrução e como ela é interpretada","O tamanho do executável","A ordem das letras do alfabeto"],c:1,e:"Regras sintáticas dizem como formar um comando; a semântica define o efeito do comando."},
+{a:4,t:"mc",q:"int idade = \"Ana\"; em C é:",o:["Sintaticamente incorreto e semanticamente correto","Sintaticamente correto e semanticamente incorreto","Correto nos dois sentidos","Um erro léxico"],c:1,e:"Bem escrito, mas sem sentido (texto em variável numérica). Resolvido pela semântica estática, na compilação."},
+{a:4,t:"match",q:"Associe cada semântica formal à sua ideia central.",p:[["Operacional","Como o programa executa, passo a passo, e como o estado muda"],["Axiomática","Asserções com pré e pós-condições"],["Denotacional","Associa o código a objetos matemáticos"]],e:"Executor, auditor e matemático."},
+{a:4,t:"mc",q:"{x > 10} soma = 2*x + 1 {soma > 1} é um exemplo de semântica:",o:["Operacional","Denotacional","Axiomática","Léxica"],c:2,e:"Asserções entre chaves antes e depois da instrução: tripla de Hoare, semântica axiomática."},
+{a:4,t:"mc",q:"O que é uma pré-condição?",o:["Asserção logo após a instrução, com o resultado desejado","Asserção que precede imediatamente a instrução e descreve as variáveis naquele ponto","O primeiro token do programa","Um erro de sintaxe"],c:1,e:"Pré-condição vem antes; pós-condição vem depois e corresponde ao resultado desejado."},
+{a:4,t:"vf",q:"A pós-condição de uma instrução corresponde ao resultado desejado.",c:true,e:"Verdadeiro. Ela descreve as novas restrições às variáveis após a instrução."},
+{a:4,t:"mc",q:"Reescrever o for do C com if e goto para mostrar o que acontece na execução é um exemplo de semântica:",o:["Operacional","Axiomática","Denotacional","Estática"],c:0,e:"Mostra as operações executadas passo a passo: operacional."},
+{a:4,t:"mc",q:"'O significado de um número binário será seu número decimal equivalente' exemplifica a semântica:",o:["Operacional","Axiomática","Denotacional","Sintática"],c:2,e:"Associa a construção a um objeto matemático: denotacional."},
+{a:4,t:"mc",q:"Qual semântica trata o programa como caixa preta, de estado inicial para estado final, ignorando os passos?",o:["Operacional","Denotacional","Axiomática","Léxica"],c:1,e:"Denotacional: foca na função de entrada e saída, como f(0) = 10."},
+{a:4,t:"mc",q:"Segundo a aula, quais são os atributos de uma variável?",o:["Nome, tipo, valor e escopo","Nome, cor e tamanho","Só o valor","Token, árvore e tabela"],c:0,e:"Variável: nome, tipo, valor, escopo. Parâmetro: nome, tipo e tipo de passagem."},
+{a:4,t:"mc",q:"O 'tipo de passagem' de um parâmetro pode ser:",o:["Estática ou dinâmica","Por valor ou por referência","Léxica ou sintática","Compilada ou interpretada"],c:1,e:"Passagem por valor (cópia) ou por referência (endereço)."},
+{a:4,t:"mc",q:"O que caracteriza a recursividade?",o:["Uma unidade que nunca termina","Uma nova ativação de uma unidade antes do término de uma ativação anterior da mesma unidade","Um laço while","Dois nomes para a mesma memória"],c:1,e:"A unidade chama a si mesma (direta ou indiretamente), como no fatorial."},
+{a:4,t:"mc",q:"Para que a semântica denotacional pode ser usada, segundo a aula?",o:["Somente para desenhar interfaces","Provar a correção de programas, projetar linguagens e gerar compiladores automaticamente","Substituir o analisador léxico","Acelerar a execução"],c:1,e:"Ela fornece um meio rigoroso de pensar sobre o programa."},
+{a:4,t:"mc",q:"Uma variável guarda o endereço de outra região da memória. Ela guarda:",o:["Um valor","Uma referência","Um token","Uma asserção"],c:1,e:"Valor = o conteúdo em si; referência = endereço de outro lugar da memória."},
+// Aula 05
+{a:5,t:"mc",q:"No exemplo do basquete, o segurança joga de forma natural, sem cálculos. Ele representa:",o:["Baixo nível de abstração","Alto nível de abstração","Amarração estática","Aliasing"],c:1,e:"Alto nível = poucos detalhes. O zelador, que calcula tudo, é baixo nível."},
+{a:5,t:"mc",q:"Na programação, a abstração separa:",o:["O que o programa faz de como ele é implementado","Compilação de interpretação","Terminais de não-terminais","Pré de pós-condição"],c:0,e:"A abstração de dados esconde os detalhes de implementação."},
+{a:5,t:"order",q:"Ordene as camadas de abstração da mais baixa para a mais alta.",items:["Hardware","Sistema operacional","Bibliotecas e frameworks","APIs","Aplicativos","Usuários"],e:"Hardware → SO → Bibliotecas e frameworks → APIs → Aplicativos → Usuários."},
+{a:5,t:"mc",q:"Qual foi a primeira abstração apresentada pelas linguagens de alto nível?",o:["Classes","Variáveis, representando localizações de memória","APIs","Exceções"],c:1,e:"A variável como representação de posições de memória."},
+{a:5,t:"mc",q:"Associado à variável, o conceito de tipo representa:",o:["O nome da variável","A classe de valores que a variável pode assumir e o conjunto de operações sobre ela","O endereço de memória","O escopo"],c:1,e:"Tipo = conjunto de valores + conjunto de operações."},
+{a:5,t:"mc",q:"O que é amarração (binding)?",o:["Converter código em bytecode","A definição do valor de um atributo de uma entidade","Um erro de tipo","Uma camada de abstração"],c:1,e:"Entidades têm atributos (nome, tipo, valor); definir o valor de um atributo é amarrar."},
+{a:5,t:"mc",q:"As linguagens variam em três aspectos da amarração. Quais?",o:["Quantidade de atributos, momento (binding time) e estabilidade","Cor, tamanho e fonte","Léxico, sintático e semântico","Compilada, interpretada e híbrida"],c:0,e:"Quantos atributos, quando ocorre e se pode mudar."},
+{a:5,t:"cls",q:"Classifique cada exemplo como amarração estática ou dinâmica.",cats:["Estática","Dinâmica"],items:[["int amarrado às operações de inteiros na definição da linguagem C",0],["Tipo de uma variável declarada em C, fixado na compilação",0],["Variável recebendo valores diferentes durante a execução",1],["Em Python, x = 5 e depois x = 'oi'",1]],e:"Estática: antes da execução e fixa. Dinâmica: durante a execução e alterável."},
+{a:5,t:"vf",q:"Existem casos em que a amarração é estabelecida em tempo de execução e não pode ser alterada depois.",c:true,e:"Verdadeiro. A aula cita isso como exceção à regra 'em execução = alterável'."},
+{a:5,t:"mc",q:"Usar print(\"Hello world\") sem saber como ele funciona internamente é exemplo de:",o:["Abstração","Aliasing","Otimização","Semântica axiomática"],c:0,e:"A abstração esconde o 'como' e mostra só o 'o quê'."},
+{a:5,t:"mc",q:"A amarração estática ocorre:",o:["Durante a execução e pode mudar","Antes da execução e não pode ser alterada","Só em linguagens interpretadas","Somente no analisador léxico"],c:1,e:"O termo 'estática' indica tanto o tempo (antes da execução) quanto a estabilidade (não muda)."},
+// Aula 06
+{a:6,t:"mc",q:"O que é compilação?",o:["Executar o código linha por linha","Traduzir o código-fonte de alto nível para uma linguagem de nível inferior","Escrever a gramática da linguagem","Otimizar a interface"],c:1,e:"Compilação traduz o código-fonte para código de máquina antes da execução."},
+{a:6,t:"cls",q:"Classifique cada linguagem pelo modelo de execução visto em aula.",cats:["Compilada","Interpretada","Híbrida"],items:[["C",0],["Go",0],["Rust",0],["Python",1],["JavaScript",1],["Ruby",1],["Java",2],["C#",2]],e:"Compiladas: C, C++, Rust, Go. Interpretadas: Python, JS, Ruby, PHP. Híbridas: Java e C#."},
+{a:6,t:"order",q:"Ordene as fases do processo de compilação.",items:["Código-fonte","Analisador léxico","Analisador sintático","Analisador semântico","Otimização","Gerador de código","Computador","Resultados"],e:"A tabela de símbolos não entra na fila: ela é consultada por várias fases."},
+{a:6,t:"mc",q:"Qual fase agrupa caracteres em tokens e ignora os comentários?",o:["Analisador sintático","Analisador léxico","Gerador de código","Otimização"],c:1,e:"O analisador léxico (scanner, lexer) monta as unidades léxicas."},
+{a:6,t:"mc",q:"O analisador sintático produz:",o:["Código de máquina","Árvores de análise (parse trees)","Tokens","Bytecode"],c:1,e:"As árvores de análise representam a estrutura sintática do programa."},
+{a:6,t:"mc",q:"Qual fase detecta erros difíceis de ver na análise sintática, como erros de tipo?",o:["Analisador léxico","Analisador semântico","Gerador de código","Computador"],c:1,e:"O analisador semântico."},
+{a:6,t:"vf",q:"A otimização é uma fase obrigatória da compilação.",c:false,e:"Falso. É opcional: melhora o programa deixando-o menor ou mais rápido."},
+{a:6,t:"mc",q:"Sobre a tabela de símbolos, é correto afirmar:",o:["É preenchida pelo gerador de código","É um banco de dados com tipos e atributos dos nomes; preenchida pelo léxico e sintático e usada pelo semântico","Guarda apenas comentários","Só existe em linguagens interpretadas"],c:1,e:"Ela serve de banco de dados para todo o processo de compilação."},
+{a:6,t:"mc",q:"O gerador de código:",o:["Cria os tokens","Converte o código intermediário otimizado em linguagem de máquina equivalente","Lê o código-fonte linha por linha","Monta a árvore de análise"],c:1,e:"É a atuação na fase final da compilação."},
+{a:6,t:"mc",q:"Em uma linguagem interpretada, o que acontece quando surge um erro?",o:["O executável é gerado mesmo assim","A interpretação para na linha do erro e a execução termina","O erro é ignorado","O código é recompilado"],c:1,e:"O interpretador executa sob demanda; ao achar erro, para naquela linha."},
+{a:6,t:"match",q:"Associe cada grupo às fases que o compõem.",p:[["Análise","Léxica, sintática e semântica"],["Síntese","Código intermediário, otimização e geração de código"],["Execução","Computador e resultados"]],e:"Análise entende o programa; síntese produz o código de máquina."},
+{a:6,t:"mc",q:"No modelo híbrido (Java, C#), quem transforma o bytecode em instruções do hardware durante a execução?",o:["O analisador léxico","A máquina virtual, com interpretador ou compilador JIT","O programador","A tabela de símbolos"],c:1,e:"A VM usa interpretador ou JIT (just in time) para gerar as instruções locais."},
+{a:6,t:"vf",q:"Linguagens compiladas geram um arquivo executável independente, pronto para rodar no sistema operacional.",c:true,e:"Verdadeiro. Por isso têm alta performance."},
+{a:6,t:"mc",q:"Antes de executar o código de máquina gerado, às vezes é necessário:",o:["Reescrever o código-fonte","Vincular programas do sistema operacional (ex.: para entrada e saída)","Apagar a tabela de símbolos","Converter para Python"],c:1,e:"Os programas necessários do SO devem ser encontrados e vinculados ao programa do usuário."},
+{a:6,t:"mc",q:"A principal diferença entre compilação e interpretação está:",o:["Na cor do editor","No momento e no modo como o código é traduzido","No número de variáveis","No paradigma usado"],c:1,e:"Compilação: tudo antes da execução. Interpretação: instrução por instrução, durante."},
+{a:6,t:"mc",q:"Qual NÃO é uma unidade léxica reunida pelo analisador léxico?",o:["Identificadores","Operadores","Comentários","Símbolos de pontuação"],c:2,e:"Comentários são ignorados. As unidades são identificadores, palavras especiais, operadores e pontuação."},
+{a:6,t:"mc",q:"Uma vantagem típica das linguagens interpretadas, segundo a aula, é:",o:["Performance máxima","Alta flexibilidade: multiplataforma e fácil de testar","Gerar executável independente","Não precisar de análise léxica"],c:1,e:"Performance máxima é das compiladas; flexibilidade é das interpretadas."}
+];
+Q.forEach((q,i)=>q.id="q"+i);
+const TOTAL=Q.length;
+$$(".lede, .aula-intro").forEach(el=>{el.innerHTML=el.innerHTML.replace(/84 questões/g,TOTAL+" questões")});
+
+/* =================== QUIZ ENGINE =================== */
+let answers=store.get("pg1-answers",{});
+let filter=store.get("pg1-filter","all");
+let pos=0, list=[];
+const FIL=[["all","Todas"],["1","Aula 1"],["2","Aula 2"],["3","Aula 3"],["4","Aula 4"],["5","Aula 5"],["6","Aula 6"],["drag","Só arrastar"],["wrong","Só as que errei"]];
+FIL.forEach(f=>{const b=document.createElement("button");b.type="button";b.textContent=f[1];b.dataset.f=f[0];b.addEventListener("click",()=>{filter=f[0];store.set("pg1-filter",filter);build(true)});$("#filters").appendChild(b)});
+const isDrag=q=>["match","order","cls"].includes(q.t);
+function build(resetPos){
+  $$("#filters button").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.f===filter)));
+  list=Q.filter(q=>filter==="all"||(filter==="drag"?isDrag(q):filter==="wrong"?(answers[q.id]&&!answers[q.id].ok):String(q.a)===filter));
+  if(resetPos){pos=list.findIndex(q=>!answers[q.id]);if(pos<0)pos=list.length}
+  render();stats();
+}
+function stats(){const done=Q.filter(q=>answers[q.id]).length, ok=Q.filter(q=>answers[q.id]&&answers[q.id].ok).length;
+  $("#tocScore").textContent=done+"/"+TOTAL;$("#tocAcc").textContent=done?`${ok} certas · ${Math.round(ok/done*100)}% de acerto`:"nenhuma respondida";$("#tocBar").style.transform="scaleX("+(done/TOTAL)+")";
+  const ld=list.filter(q=>answers[q.id]).length;$("#qCount").innerHTML=`<strong>${ld}</strong> de ${list.length} respondidas neste filtro`;$("#qBar").style.transform="scaleX("+(list.length?ld/list.length:0)+")"}
+function save(q,ok){answers[q.id]={ok};store.set("pg1-answers",answers);stats()}
+function shuffle(a){a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
+const TYPE={mc:"Marque a correta",vf:"Verdadeiro ou falso",match:"Arraste para associar",order:"Arraste para ordenar",cls:"Arraste para classificar"};
+
+function render(){
+  const box=$("#quiz");box.innerHTML="";
+  if(!list.length){box.innerHTML=`<p style="font-size:18px">${filter==="wrong"?"Nenhuma questão errada. Bom sinal. Tente o filtro Todas ou uma aula específica.":"Nada neste filtro."}</p>`;return}
+  if(pos>=list.length){renderSummary(box);return}
+  const q=list[pos];
+  box.innerHTML=`<div class="qmeta">Questão ${pos+1} de ${list.length} · Aula ${q.a} · ${TYPE[q.t]}</div><p class="qtext">${esc(q.q)}</p><div id="qbody"></div><div id="qexpl"></div><div class="qnav"><button class="btn-s alt" id="prevB" type="button" ${pos===0?"disabled":""}>Anterior</button><button class="btn-s" id="nextB" type="button">${pos===list.length-1?"Ver resultado":"Próxima"}</button></div>`;
+  $("#prevB").addEventListener("click",()=>{pos=Math.max(0,pos-1);render();$("#simulado").scrollIntoView({block:"start"})});
+  $("#nextB").addEventListener("click",()=>{pos++;render();$("#simulado").scrollIntoView({block:"start"})});
+  const body=$("#qbody");
+  if(q.t==="mc"||q.t==="vf")renderMC(q,body);else renderDnD(q,body);
+}
+function explain(q,ok,extra){$("#qexpl").innerHTML=`<div class="expl"><b class="${ok?"ok":"bad"}">${ok?"Certo.":"Não foi dessa vez."}</b> ${esc(q.e)}${extra||""}</div>`}
+function renderMC(q,body){
+  const opts=q.t==="vf"?[["Verdadeiro",q.c===true],["Falso",q.c===false]]:shuffle(q.o.map((t,i)=>[t,i===q.c]));
+  const wrap=document.createElement("div");wrap.className="opts";
+  opts.forEach((o,i)=>{const b=document.createElement("button");b.type="button";b.className="opt";b.innerHTML=`<span class="k">${String.fromCharCode(65+i)}</span><span>${esc(o[0])}</span>`;b.dataset.ok=o[1]?"1":"0";
+    b.addEventListener("click",()=>{$$(".opt",wrap).forEach(x=>{x.disabled=true;if(x.dataset.ok==="1")x.classList.add("ok")});if(!o[1])b.classList.add("bad");save(q,o[1]);explain(q,o[1])});wrap.appendChild(b)});
+  body.appendChild(wrap);
+  if(answers[q.id]){ $$(".opt",wrap).forEach(x=>{x.disabled=true;if(x.dataset.ok==="1")x.classList.add("ok")});explain(q,answers[q.id].ok,'<br><span style="color:var(--muted);font-size:14px">Você já respondeu esta. Use o filtro "Só as que errei" para refazer as erradas.</span>');}
+}
+
+/* drag & drop engine: pointer events + tap fallback */
+function renderDnD(q,body){
+  let chips=[], slots=[];
+  if(q.t==="match"){q.p.forEach((p,i)=>{chips.push({id:"c"+i,text:p[1],want:"s"+i});slots.push({id:"s"+i,label:p[0],cap:1})})}
+  else if(q.t==="order"){q.items.forEach((t,i)=>{chips.push({id:"c"+i,text:t,want:"s"+i});slots.push({id:"s"+i,label:String(i+1)+"º",cap:1})})}
+  else{q.cats.forEach((c,i)=>slots.push({id:"s"+i,label:c,cap:99}));q.items.forEach((it,i)=>chips.push({id:"c"+i,text:it[0],want:"s"+it[1]}))}
+  chips=shuffle(chips);
+  const place={};chips.forEach(c=>place[c.id]="pool");
+  let selected=null, checked=false;
+  const wrap=document.createElement("div");wrap.className="dnd";body.appendChild(wrap);
+  const hint=document.createElement("p");hint.style.cssText="margin:0;color:var(--muted);font-size:14.5px";hint.textContent="Arraste cada peça para o lugar certo, ou toque na peça e depois no espaço.";
+
+  function draw(){
+    wrap.innerHTML="";wrap.appendChild(hint);
+    const pool=document.createElement("div");pool.className="pool dz";pool.dataset.slot="pool";pool.setAttribute("aria-label","Peças disponíveis");
+    chips.filter(c=>place[c.id]==="pool").forEach(c=>pool.appendChild(chipEl(c)));
+    if(!pool.children.length)pool.classList.add("empty");
+    wrap.appendChild(pool);
+    if(q.t==="cls"){const bk=document.createElement("div");bk.className="buckets";slots.forEach(s=>{const b=document.createElement("div");b.className="bucket";b.innerHTML=`<h5>${esc(s.label)}</h5>`;const z=zoneEl(s);chips.filter(c=>place[c.id]===s.id).forEach(c=>z.appendChild(chipEl(c)));b.appendChild(z);bk.appendChild(b)});wrap.appendChild(bk)}
+    else{const sl=document.createElement("div");sl.className="slots";slots.forEach(s=>{const r=document.createElement("div");r.className="slot-row";const l=document.createElement("div");l.className="slot-label";l.innerHTML=q.t==="order"?`<span class="n">${esc(s.label)}</span>`:esc(s.label);const z=zoneEl(s);chips.filter(c=>place[c.id]===s.id).forEach(c=>z.appendChild(chipEl(c)));r.appendChild(l);r.appendChild(z);sl.appendChild(r)});wrap.appendChild(sl)}
+    if(!checked){const act=document.createElement("div");act.className="row";const v=document.createElement("button");v.type="button";v.className="btn-s";v.textContent="Verificar";v.addEventListener("click",verify);const r=document.createElement("button");r.type="button";r.className="btn-s alt";r.textContent="Limpar";r.addEventListener("click",()=>{chips.forEach(c=>place[c.id]="pool");selected=null;draw()});act.appendChild(v);act.appendChild(r);wrap.appendChild(act)}
+  }
+  function zoneEl(s){const z=document.createElement("div");z.className="dz";z.dataset.slot=s.id;z.setAttribute("role","button");z.setAttribute("tabindex","0");z.setAttribute("aria-label","Espaço "+s.label);
+    const act=()=>{if(selected&&!checked){move(selected,s.id);selected=null;draw()}};z.addEventListener("click",e=>{if(e.target===z)act()});z.addEventListener("keydown",e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();act()}});return z}
+  function chipEl(c){const b=document.createElement("button");b.type="button";b.className="chip";b.textContent=c.text;b.dataset.cid=c.id;
+    if(selected===c.id)b.classList.add("sel");
+    if(checked)b.classList.add(place[c.id]===c.want?"ok":"bad");
+    if(!checked){attachDrag(b,c);b.addEventListener("keydown",e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();selected=selected===c.id?null:c.id;draw()}})}
+    return b}
+  function move(cid,sid){const s=slots.find(x=>x.id===sid);if(s&&s.cap===1){const occ=chips.find(c=>place[c.id]===sid&&c.id!==cid);if(occ)place[occ.id]=place[cid]}place[cid]=sid}
+  function attachDrag(el,c){
+    let sx,sy,dragging=false,ghost=null,over=null,pid=null;
+    el.addEventListener("pointerdown",e=>{if(e.button!==undefined&&e.button!==0)return;sx=e.clientX;sy=e.clientY;dragging=false;pid=e.pointerId;try{el.setPointerCapture(pid)}catch(_){}});
+    el.addEventListener("pointermove",e=>{if(pid===null||e.pointerId!==pid)return;
+      if(!dragging&&Math.hypot(e.clientX-sx,e.clientY-sy)>6){dragging=true;ghost=el.cloneNode(true);ghost.classList.add("ghost");ghost.style.width=el.offsetWidth+"px";document.body.appendChild(ghost);el.style.opacity=".35"}
+      if(dragging){ghost.style.left=e.clientX+"px";ghost.style.top=e.clientY+"px";const t=document.elementFromPoint(e.clientX,e.clientY);const z=t&&t.closest(".dz");if(over&&over!==z)over.classList.remove("hover");if(z&&wrap.contains(z)){z.classList.add("hover");over=z}else over=null}});
+    const end=e=>{if(pid===null)return;const wasDrag=dragging;pid=null;
+      if(wasDrag){ghost&&ghost.remove();el.style.opacity="";const t=document.elementFromPoint(e.clientX,e.clientY);const z=t&&t.closest(".dz");if(over)over.classList.remove("hover");if(z&&wrap.contains(z)){move(c.id,z.dataset.slot);selected=null;draw()}}
+      else{ if(selected&&selected!==c.id&&place[c.id]!=="pool"){ /* tapped chip inside a slot while another selected: place selected there */ move(selected,place[c.id]);selected=null;draw();return}
+            selected=selected===c.id?null:c.id;draw()}
+      dragging=false};
+    el.addEventListener("pointerup",end);
+    el.addEventListener("pointercancel",()=>{pid=null;dragging=false;ghost&&ghost.remove();el.style.opacity="";if(over)over.classList.remove("hover")});
+  }
+  function verify(){
+    if(chips.some(c=>place[c.id]==="pool")){hint.textContent="Ainda há peças soltas. Encaixe todas antes de verificar.";hint.style.color="var(--bad)";return}
+    checked=true;const ok=chips.every(c=>place[c.id]===c.want);save(q,ok);draw();
+    let extra="";if(!ok){extra='<br><br><strong>Resposta:</strong> '+(q.t==="match"?q.p.map(p=>`${esc(p[0])} → ${esc(p[1])}`).join(" · "):q.t==="order"?q.items.map((t,i)=>`${i+1}. ${esc(t)}`).join(" · "):q.cats.map((c,ci)=>`<em>${esc(c)}:</em> ${q.items.filter(it=>it[1]===ci).map(it=>esc(it[0])).join(", ")}`).join(" · "))}
+    explain(q,ok,extra)}
+  draw();
+  if(answers[q.id]){hint.textContent="Você já respondeu esta ("+(answers[q.id].ok?"acertou":"errou")+"). Pode refazer para treinar; a nota salva é a da primeira tentativa, até você reiniciar.";}
+}
+
+function renderSummary(box){
+  const done=Q.filter(q=>answers[q.id]),ok=done.filter(q=>answers[q.id].ok);
+  const pct=done.length?Math.round(ok.length/done.length*100):0;
+  let per="";for(let a=1;a<=6;a++){const qa=Q.filter(q=>q.a===a),d=qa.filter(q=>answers[q.id]),o=d.filter(q=>answers[q.id].ok);per+=`<div><span style="font-size:13px;color:var(--muted)">Aula ${a}</span><b>${o.length}/${qa.length}</b><div class="bar"><i style="transform:scaleX(${qa.length?o.length/qa.length:0});background:${d.length&&o.length/d.length<.6?"var(--bad)":"var(--ok)"}"></i></div></div>`}
+  const weak=[1,2,3,4,5,6].filter(a=>{const d=Q.filter(q=>q.a===a&&answers[q.id]);return d.length&&d.filter(q=>answers[q.id].ok).length/d.length<.7});
+  box.innerHTML=`<div class="summary"><div class="qmeta">Resultado geral</div><div class="score-big">${pct}%</div><p style="margin:6px 0 0">${ok.length} certas em ${done.length} respondidas, de ${TOTAL} questões.</p>
+  <div class="per">${per}</div>
+  <p>${weak.length?"Volte para revisar: "+weak.map(a=>`<a href="#a${a}">Aula ${a}</a>`).join(", ")+". Depois refaça só as erradas.":(done.length===TOTAL?"Acima de 70% em todas as aulas. Você está pronto.":"Continue respondendo para ver onde precisa reforçar.")}</p>
+  <div class="row" style="margin-top:14px"><button class="btn-s" id="wrongB" type="button">Refazer só as erradas</button><button class="btn-s alt" id="againB" type="button">Voltar ao início do filtro</button><button class="btn-s alt" id="resetAll" type="button">Apagar respostas e recomeçar</button></div></div>`;
+  $("#wrongB").addEventListener("click",()=>{const w=Q.filter(q=>answers[q.id]&&!answers[q.id].ok);w.forEach(q=>delete answers[q.id]);store.set("pg1-answers",answers);filter="all";store.set("pg1-filter",filter);
+    $$("#filters button").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.f===filter)));list=w;pos=0;render();stats()});
+  $("#againB").addEventListener("click",()=>{pos=0;render()});
+  $("#resetAll").addEventListener("click",()=>{if(confirm("Apagar todas as respostas salvas?")){answers={};store.set("pg1-answers",answers);build(true)}});
+}
+build(true);
+})();
+</script>
+</body>
+</html>
